@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import os
 
-from azfls.api_engine import APIConfig
+from chooseonly.api_engine import APIConfig
 
 DEFAULT_MODEL = "deepseek-chat"
 

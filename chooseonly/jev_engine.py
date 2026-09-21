@@ -26,14 +26,14 @@ import urllib.request
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
-from azfls.candidate import (
+from chooseonly.candidate import (
     CandidateChoice,
     CandidateError,
     CandidatePage,
     CodeTask,
     validate_page,
 )
-from azfls.model import Stats
+from chooseonly.model import Stats
 
 ENDPOINT = "https://api.typesafe.ai/v1/systemone"
 MODEL = "jev-latest"

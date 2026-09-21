@@ -6,7 +6,7 @@ import json
 import time
 from pathlib import Path
 
-from azfls.candidate import (
+from chooseonly.candidate import (
     CandidateError,
     CandidatePage,
     CodeCandidate,
@@ -14,7 +14,7 @@ from azfls.candidate import (
     choose_candidate,
     materialize,
 )
-from azfls.model import MLXEngine, Stats
+from chooseonly.model import MLXEngine, Stats
 
 
 MODEL_PATH = (

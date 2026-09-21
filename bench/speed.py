@@ -26,9 +26,9 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from azfls.adapter import to_artifact
-from azfls.contracts import Action, Brief, Kind
-from azfls.decide import (
+from chooseonly.adapter import to_artifact
+from chooseonly.contracts import Action, Brief, Kind
+from chooseonly.decide import (
     DECISION_MAX_TOKENS,
     DECISION_SYSTEM_PROMPT,
     Decision,
@@ -38,7 +38,7 @@ from azfls.decide import (
     extract,
     parse_decision,
 )
-from azfls.model import Engine, MLXEngine, request_body
+from chooseonly.model import Engine, MLXEngine, request_body
 from bench.compare import (
     BENCH_SOURCE,
     EXPECTED_FIELDS,

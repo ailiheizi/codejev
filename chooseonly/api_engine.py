@@ -9,7 +9,7 @@ import urllib.request
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
-from azfls.model import Stats
+from chooseonly.model import Stats
 
 
 @dataclass(frozen=True)

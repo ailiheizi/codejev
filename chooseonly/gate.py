@@ -13,7 +13,7 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
-from azfls.contracts import Artifact, content_hash, resolve_target
+from chooseonly.contracts import Artifact, content_hash, resolve_target
 
 
 class GateError(Exception):

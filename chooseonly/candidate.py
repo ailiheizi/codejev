@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from azfls.model import Engine, Stats
+from chooseonly.model import Engine, Stats
 
 
 class CandidateError(Exception):

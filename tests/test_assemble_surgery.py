@@ -16,7 +16,7 @@ from typing import Any
 
 import pytest
 
-from azfls.decide import (
+from chooseonly.decide import (
     Candidate,
     Candidates,
     Decision,

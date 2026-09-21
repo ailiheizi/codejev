@@ -108,13 +108,13 @@ def paid_orders(orders):
 ## 怎么自己复核
 
 ```bash
-cd az-fls
+cd chooseonly
 .venv/bin/python -m pytest tests/ -q          # 全部离线，不加载模型
 HF_HUB_OFFLINE=1 .venv/bin/python -m bench.compare --trials 8   # 任务 A 的两条路线对照
-.venv/bin/python -m azfls.cli check           # 环境自检（不加载权重）
+.venv/bin/python -m chooseonly.cli check           # 环境自检（不加载权重）
 ```
 
-`azfls.cli ask` 与 `azfls.cli select` 的用法见 [README](../README.md)。
+`chooseonly.cli ask` 与 `chooseonly.cli select` 的用法见 [README](../README.md)。
 
 ## 附加实验：换更小的模型（0.5B）是不是更快的杠杆
 
@@ -233,7 +233,7 @@ token 更快、输出更短而大约减半（约 0.35→0.16 s），所以总量
 拒绝），换小模型只会把失败搬到更晚、更难解释的地方。同样的时间预算更值得花在
 **提示与调用结构**上：固定前缀的 prefill 实测就占 1.5B 决策耗时的近一半（0.32–0.34 s，
 其中 system 提示约占 0.09 s），让这段固定前缀的 KV cache 复用、或缩短 system 提示，
-是不牺牲正确率的杠杆（前者涉及 `azfls/model.py`，本轮未实现、未实测）。
+是不牺牲正确率的杠杆（前者涉及 `chooseonly/model.py`，本轮未实现、未实测）。
 以上都是**单机小样本**（每变体两次各 5 次）观测，机器当时有其他负载（load average 8–19，
 10 核），两次运行的均值最大差到 2 倍以上（1.5B＋select 任务 B：1.53 s 与 0.72 s），
 不构成通用性能结论；通过/失败模式在五次完整运行中完全一致，时间只报区间。
@@ -244,12 +244,12 @@ token 更快、输出更短而大约减半（约 0.35→0.16 s），所以总量
 ### 怎么复核这一节
 
 ```bash
-cd az-fls
+cd chooseonly
 HF_HUB_OFFLINE=1 .venv/bin/python -m bench.speed --trials 5                # 四个变体
 HF_HUB_OFFLINE=1 .venv/bin/python -m bench.speed --trials 5 --diagnostic   # 附：删掉示例行的诊断
 ```
 
-上表两次运行用的 `azfls/decide.py` 版本 sha256 前缀 `014a3b56`（选择路线的组装逻辑
+上表两次运行用的 `chooseonly/decide.py` 版本 sha256 前缀 `014a3b56`（选择路线的组装逻辑
 由另一位负责，期间正在改动；更早的两次运行用的是上一版，通过/失败模式与上表一致）。
 
 ## 选择路线的延迟拆解与更短输出探针
@@ -312,11 +312,11 @@ detokenizer：与模型、提示、输出长度都无关。另：换更小的模
 ### 怎么复核这一节
 
 ```bash
-cd az-fls
+cd chooseonly
 HF_HUB_OFFLINE=1 .venv/bin/python bench/timing.py --trials 9
 ```
 
-`bench/timing.py` 只读现有模块：候选表用 `azfls.decide.extract`，提示用
+`bench/timing.py` 只读现有模块：候选表用 `chooseonly.decide.extract`，提示用
 `build_decision_prompt`，JSON 格式直接用生产解析器 `parse_decision`；精简 JSON 与裸 token
 折成规范 JSON 后仍走同一个 `parse_decision`，因此 id 校验标准完全一致。
 
@@ -442,7 +442,7 @@ TPF 只是分子分母同时变化的比值，块越大并行度越高、但每�
 ### 怎么复核这一节
 
 ```bash
-cd az-fls
+cd chooseonly
 HF_HUB_OFFLINE=1 .venv/bin/python -m bench.diffusion_probe --backend baseline     --trials 5
 HF_HUB_OFFLINE=1 .venv/bin/python -m bench.diffusion_probe --backend nemotron-ar --trials 5
 HF_HUB_OFFLINE=1 .venv/bin/python -m bench.diffusion_probe --backend diffusion  --trials 5
@@ -474,7 +474,7 @@ N 倍吞吐（一块 GPU），所以真正可能的杠杆是**批处理**：N �
   不一致会逐条打印，本轮没有触发。
 - 另用**不同长度**的合成提示（37/53/71 token，填充最多 34 个 token）单独验过左填 mask：
   批处理与顺序逐 token 一致（主实验 8 条提示都是 193–215 token，填充最多 22 个，压不满 mask）。
-- 正确性不是"看代码像不像"：解析决策 → `azfls.decide.assemble` 组装 → 真的 `exec`、
+- 正确性不是"看代码像不像"：解析决策 → `chooseonly.decide.assemble` 组装 → 真的 `exec`、
   真的调用函数，核对过滤结果与返回字段（空输入还要仍返回 `[]`）；
   `active_users` 这一条同时过一遍 `bench/compare.py` 的 `check_runtime_behaviour`。
 - 跑之前修过第一版 4 处（它没被跑过）：解码步多传了一根轴（必崩）、
@@ -589,7 +589,7 @@ N 倍吞吐（一块 GPU），所以真正可能的杠杆是**批处理**：N �
 ### 怎么复核这一节
 
 ```bash
-cd az-fls
+cd chooseonly
 HF_HUB_OFFLINE=1 .venv/bin/python -m bench.batching   # 3 轮，1/2/4/8 + 前缀共享
 HF_HUB_OFFLINE=1 .venv/bin/python -m bench.batching --batches 4,8 --rounds 4 --skip-prefix
 ```
@@ -600,7 +600,7 @@ HF_HUB_OFFLINE=1 .venv/bin/python -m bench.batching --batches 4,8 --rounds 4 --s
 ## 排序槽位的四项实测，以及它顺手暴露的一次生产回归（2026-09-20）
 
 [选择路线的槽位](12-selection-slots.md)规定：每加一个槽位必须量四件事。
-排序槽位早已并入 `azfls/decide.py`（`sort_field` / `sort_desc`，由调用方通过
+排序槽位早已并入 `chooseonly/decide.py`（`sort_field` / `sort_desc`，由调用方通过
 `sort_enabled` 显式开启），但这份数字一直没记档。补测的过程分成三段：先发现脚本
 自己有两处缺陷，再发现**生产主路径被这次改动弄坏了**，最后才拿到四项数字。
 
@@ -683,7 +683,7 @@ function=fn0，不过滤，return_fields=f1=id、f2=name，排序=不动原文
 
 ### E. 修法与验证
 
-`azfls/decide.py` 的 `DECISION_SYSTEM_PROMPT` 恢复成加槽位前的逐字原文（含那行示例），
+`chooseonly/decide.py` 的 `DECISION_SYSTEM_PROMPT` 恢复成加槽位前的逐字原文（含那行示例），
 排序条款只在启用时才追加：
 
 ```text
@@ -775,17 +775,17 @@ diff：- if order.paid and not order.shipped:
 ### 怎么复核这一节
 
 ```bash
-cd az-fls
+cd chooseonly
 HF_HUB_OFFLINE=1 .venv/bin/python bench/sort_slot.py --repeats 3 --json bench/sort_slot.json
 HF_HUB_OFFLINE=1 .venv/bin/python bench/sort_slot.py --skip-model   # 只跑拒绝质量，不加载权重
 .venv/bin/python -m pytest tests/ -q                                # 全部离线
 ```
 
-`bench/sort_slot.py` 只读现有模块：候选用 `azfls.decide.extract`，提示用
+`bench/sort_slot.py` 只读现有模块：候选用 `chooseonly.decide.extract`，提示用
 `build_decision_prompt`，解析用生产解析器 `parse_decision`，组装用 `assemble`，
 判断口径与 CLI 一致。数字同时写入 `bench/sort_slot.json`。
 
-提示本身的生产约束（那行示例不能删）写在 `azfls/decide.py` 的 `DECISION_SYSTEM_PROMPT`
+提示本身的生产约束（那行示例不能删）写在 `chooseonly/decide.py` 的 `DECISION_SYSTEM_PROMPT`
 上方注释里，并且由 `tests/test_decide.py` 的两条断言守着。
 
 ## Mercury 2.5（扩散 LLM）实测：选择路线不行，生成路线很行（2026-09-20）
@@ -794,7 +794,7 @@ Mercury 是 Inception Labs 的扩散语言模型。**它没有开源权重**：
 HuggingFace 上 `inceptionai` 与 `inception-labs` 名下零模型，官方文档只有 API 用法，
 没有任何 weights/download/license 字样。所以本机跑不了，只能走 API。
 
-好消息是它是 **OpenAI-compatible**，`azfls/api_engine.py` 零改动就接上了。
+好消息是它是 **OpenAI-compatible**，`chooseonly/api_engine.py` 零改动就接上了。
 
 ### 必须的配置：`reasoning_effort: "none"`
 

@@ -13,8 +13,8 @@ from dataclasses import replace
 
 import pytest
 
-from azfls.contracts import Action, Kind, content_hash, normalize_body
-from azfls.decide import (
+from chooseonly.contracts import Action, Kind, content_hash, normalize_body
+from chooseonly.decide import (
     DECISION_SYSTEM_PROMPT,
     Candidate,
     Candidates,
@@ -27,14 +27,14 @@ from azfls.decide import (
     parse_decision,
     run_decision,
 )
-from azfls.fixtures import (
+from chooseonly.fixtures import (
     BROKEN_MODULE,
     NO_FUNCTION_MODULE,
     ORDERS_MODULE,
     PRODUCTS_MODULE,
     USERS_MODULE,
 )
-from azfls.model import ScriptedEngine
+from chooseonly.model import ScriptedEngine
 
 TARGET = "app/users.py"
 

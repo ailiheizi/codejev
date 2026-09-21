@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from azfls.candidate import (
+from chooseonly.candidate import (
     CandidateChoice,
     CandidateError,
     CandidatePage,
@@ -16,7 +16,7 @@ from azfls.candidate import (
     parse_choice,
     validate_page,
 )
-from azfls.model import ScriptedEngine
+from chooseonly.model import ScriptedEngine
 
 
 PYTHON_TASK = CodeTask(

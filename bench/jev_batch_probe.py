@@ -1,6 +1,6 @@
 """Jev 在**真实源码候选池**上的批量选择：15 条任务。
 
-候选池不再是手写的 3 条，而是从真实文件里枚举出的函数（azfls/candidate.py），
+候选池不再是手写的 3 条，而是从真实文件里枚举出的函数（chooseonly/candidate.py），
 评审判据由宿主自己算：选中的函数必须能通过行为指纹（真的 import 并调用）。
 
 15 条任务分三类：
@@ -19,10 +19,10 @@ import os
 import time
 from pathlib import Path
 
-from azfls.candidate import CandidatePage, CodeCandidate, CodeTask
-from azfls.jev_engine import TypesafeConfig, TypesafeEngine
+from chooseonly.candidate import CandidatePage, CodeCandidate, CodeTask
+from chooseonly.jev_engine import TypesafeConfig, TypesafeEngine
 
-SOURCE = Path(__file__).resolve().parent.parent / "azfls" / "candidate.py"
+SOURCE = Path(__file__).resolve().parent.parent / "chooseonly" / "candidate.py"
 
 
 def enumerate_functions(path: Path, limit: int = 12) -> tuple[CodeCandidate, ...]:

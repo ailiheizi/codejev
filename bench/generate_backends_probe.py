@@ -21,10 +21,10 @@ import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 
-from azfls.adapter import to_artifact
-from azfls.api_engine import OpenAICompatibleEngine
-from azfls.contracts import Action, Brief, Kind
-from azfls.model import MLXEngine
+from chooseonly.adapter import to_artifact
+from chooseonly.api_engine import OpenAICompatibleEngine
+from chooseonly.contracts import Action, Brief, Kind
+from chooseonly.model import MLXEngine
 
 TARGET = "record_ops.py"
 INSTRUCTION = (
@@ -171,7 +171,7 @@ def run_backend(backend: Backend, brief: Brief, trials: int) -> None:
     print(f"后端：{backend.label}")
     print("=" * 84)
     print(f"  {'#':>2s} {'结果':>5s} {'输出tok':>8s} {'墙钟s':>7s} {'tok/s':>7s}  说明")
-    from azfls.adapter import build_messages
+    from chooseonly.adapter import build_messages
 
     messages = build_messages(brief)
     passed = 0

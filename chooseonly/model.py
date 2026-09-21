@@ -11,8 +11,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Protocol
 
-from azfls.adapter import build_messages
-from azfls.contracts import Brief
+from chooseonly.adapter import build_messages
+from chooseonly.contracts import Brief
 
 DEFAULT_MODEL = str(
     Path(__file__).resolve().parent.parent / "models" / "Qwen2.5-Coder-1.5B-Instruct-4bit"

@@ -1,18 +1,18 @@
 """候选页选择准确率对**提示写法**的敏感度：2/5 里有多少是提示造成的（有界实验）。
 
 背景：同一批 5 条任务、同一个候选页、同一个 Qwen2.5-Coder-1.5B（温度 0），
-`bench/candidate_probe.py` 记下的现状是 2/5；而 `azfls/decide.py` 的选择路线
+`bench/candidate_probe.py` 记下的现状是 2/5；而 `chooseonly/decide.py` 的选择路线
 实测过“系统提示里少一行工作示例”会把 15/15 打成 3/15（模型整个省掉 `f` 键）。
 所以本脚本只问一个问题：候选页的 2/5 有多少来自提示写法，多少来自模型能力。
 
 三个变体（**措辞在跑之前写死**，跑完不看结果换措辞）：
 
-- V0：现状，逐字使用 `azfls.candidate.build_selection_messages` 的产物；
+- V0：现状，逐字使用 `chooseonly.candidate.build_selection_messages` 的产物；
 - V1：V0 的**系统提示**末尾追加一条最小工作示例（示例页 + 命中候选 → 回它的 id）；
 - V2：V1 的系统提示末尾再追加一条**该回 NONE 的示例**（示例页里没有能完成该任务的候选）。
 
 三者只差系统提示的文本：**用户消息逐字相同**（脚本内 assert），候选页、任务文件、
-严格解析器（`azfls.candidate.parse_choice`）一个字都没改。本脚本不写盘、不改生产代码，
+严格解析器（`chooseonly.candidate.parse_choice`）一个字都没改。本脚本不写盘、不改生产代码，
 产出只有 stdout 上的证据。
 
 严格口径：解析结果精确等于候选 id 或 NONE（模型回 `NO_MATCH` 也算 NONE）才 PASS；
@@ -39,19 +39,19 @@ from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-if str(ROOT) not in sys.path:  # 直接以脚本方式运行时，也能 import azfls
+if str(ROOT) not in sys.path:  # 直接以脚本方式运行时，也能 import chooseonly
     sys.path.insert(0, str(ROOT))
 # 只用本机模型目录：整个脚本不需要联网。
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
-from azfls.candidate import (  # noqa: E402 - 先修好 sys.path 再导入
+from chooseonly.candidate import (  # noqa: E402 - 先修好 sys.path 再导入
     _SYSTEM_PROMPT,
     CandidateError,
     CodeTask,
     build_selection_messages,
     parse_choice,
 )
-from azfls.model import MLXEngine, Stats  # noqa: E402
+from chooseonly.model import MLXEngine, Stats  # noqa: E402
 from bench.candidate_probe import MODEL_PATH, PAGE, load_tasks  # noqa: E402
 
 # 与 `choose_candidate` 的默认值一致：一个 id 或 NONE 就是全部输出。

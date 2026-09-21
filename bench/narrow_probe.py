@@ -18,9 +18,9 @@ import textwrap
 import time
 from pathlib import Path
 
-from azfls.adapter import build_messages, to_artifact
-from azfls.contracts import Action, Brief, Kind
-from azfls.model import MLXEngine
+from chooseonly.adapter import build_messages, to_artifact
+from chooseonly.contracts import Action, Brief, Kind
+from chooseonly.model import MLXEngine
 
 MODEL = str(
     Path(__file__).resolve().parent.parent / "models" / "Qwen2.5-Coder-1.5B-Instruct-4bit"

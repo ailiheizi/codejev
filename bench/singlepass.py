@@ -35,7 +35,7 @@ import mlx.core as mx
 from mlx_lm import load
 from mlx_lm.models.cache import make_prompt_cache
 
-from azfls.decide import (
+from chooseonly.decide import (
     DECISION_MAX_TOKENS,
     Candidates,
     Decision,
@@ -45,7 +45,7 @@ from azfls.decide import (
     extract,
     parse_decision,
 )
-from azfls.model import MLXEngine
+from chooseonly.model import MLXEngine
 from bench.compare import BENCH_SOURCE, TASK_FUNCTION, TASK_INSTRUCTION, check_runtime_behaviour
 
 MODEL = str(

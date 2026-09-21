@@ -1,4 +1,4 @@
-# az-fls：把选择权从模型手里拿走，交给宿主
+# chooseonly：把选择权从模型手里拿走，交给宿主
 
 > **English**: When a task is fixed enough, don't let the model write what it can *choose*.
 > The host enumerates the candidates; a tiny model only returns an id; the host assembles
@@ -111,11 +111,11 @@ export TYPESAFE_API_KEY=...
 .venv/bin/python -m bench.jev_batch_probe    # 真实源码候选池 15 条
 
 # CLI：生成路线与槽位级选择路线
-.venv/bin/python -m azfls.cli ask    --workspace /path/to/proj --target app/users.py \
+.venv/bin/python -m chooseonly.cli ask    --workspace /path/to/proj --target app/users.py \
   --instruction "只保留 active 为真的项，返回 id 和 name" --dry-run
-.venv/bin/python -m azfls.cli select --workspace /path/to/proj --target app/users.py \
+.venv/bin/python -m chooseonly.cli select --workspace /path/to/proj --target app/users.py \
   --function active_users --instruction "只保留 active 为真的项" --dry-run
-.venv/bin/python -m azfls.cli check
+.venv/bin/python -m chooseonly.cli check
 ```
 
 ## 成本（按实测 token 数与官方标价）
@@ -132,7 +132,7 @@ Jev 在"选择"这个角色上比 API 生成模型便宜约 3–6 倍，但**它
 ## 代码结构
 
 ```text
-azfls/
+chooseonly/
   contracts.py     共享形状：Brief / Artifact / 内容哈希 / 路径解析
   adapter.py       包装正文、生成 diff、完整性检查
   gate.py          确认门：审批绑定目标与内容哈希，内容变了旧确认自动失效

@@ -14,9 +14,9 @@ import json
 import time
 from pathlib import Path
 
-from azfls.api_engine import OpenAICompatibleEngine
-from azfls.candidate import CandidateError, choose_candidate, materialize
-from azfls.model import Stats
+from chooseonly.api_engine import OpenAICompatibleEngine
+from chooseonly.candidate import CandidateError, choose_candidate, materialize
+from chooseonly.model import Stats
 from bench.candidate_probe import PAGE, load_tasks
 from bench.provider_config import DEFAULT_MODEL, load_provider
 
