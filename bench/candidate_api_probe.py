@@ -14,9 +14,9 @@ import json
 import time
 from pathlib import Path
 
-from chooseonly.api_engine import OpenAICompatibleEngine
-from chooseonly.candidate import CandidateError, choose_candidate, materialize
-from chooseonly.model import Stats
+from codejev.api_engine import OpenAICompatibleEngine
+from codejev.candidate import CandidateError, choose_candidate, materialize
+from codejev.model import Stats
 from bench.candidate_probe import PAGE, load_tasks
 from bench.provider_config import DEFAULT_MODEL, load_provider
 

@@ -14,7 +14,7 @@
     HF_HUB_OFFLINE=1 .venv/bin/python bench/timing.py --trials 9
 
 本脚本只读现有模块（extract / build_decision_prompt / parse_decision 原样复用），
-不修改任何 chooseonly 代码；它测量的是现有选择路径换引擎调用方式之后的结果。
+不修改任何 codejev 代码；它测量的是现有选择路径换引擎调用方式之后的结果。
 """
 
 from __future__ import annotations
@@ -30,10 +30,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-if str(ROOT) not in sys.path:  # 直接以脚本方式运行时，也能 import chooseonly
+if str(ROOT) not in sys.path:  # 直接以脚本方式运行时，也能 import codejev
     sys.path.insert(0, str(ROOT))
 
-from chooseonly.decide import (  # noqa: E402 - 先修好 sys.path 再导入
+from codejev.decide import (  # noqa: E402 - 先修好 sys.path 再导入
     DECISION_SYSTEM_PROMPT,
     FUNCTION_ID,
     Candidates,
@@ -44,7 +44,7 @@ from chooseonly.decide import (  # noqa: E402 - 先修好 sys.path 再导入
     extract,
     parse_decision,
 )
-from chooseonly.model import DEFAULT_MODEL, clean_body  # noqa: E402
+from codejev.model import DEFAULT_MODEL, clean_body  # noqa: E402
 from bench.compare import BENCH_SOURCE, TASK_FUNCTION, TASK_INSTRUCTION  # noqa: E402
 
 # 决策任务的输出上限；与 bench/compare.py 的选择路线一致（36 token 左右就会 EOS，
@@ -166,7 +166,7 @@ class Streamer:
         return "".join(parts), timing
 
     def run_plain(self, messages: list[dict[str, str]], max_tokens: int) -> tuple[str, float]:
-        """非流式对照：与 chooseonly.model.MLXEngine.generate 同一调用，用来核对基线。"""
+        """非流式对照：与 codejev.model.MLXEngine.generate 同一调用，用来核对基线。"""
         from mlx_lm import generate as mlx_generate
         from mlx_lm.sample_utils import make_sampler
 

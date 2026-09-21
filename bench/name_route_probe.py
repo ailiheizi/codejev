@@ -23,9 +23,9 @@ import textwrap
 import time
 from pathlib import Path
 
-from chooseonly.adapter import build_messages
-from chooseonly.contracts import Action, Brief, Kind
-from chooseonly.model import MLXEngine
+from codejev.adapter import build_messages
+from codejev.contracts import Action, Brief, Kind
+from codejev.model import MLXEngine
 
 MODEL = str(
     Path(__file__).resolve().parent.parent / "models" / "Qwen2.5-Coder-1.5B-Instruct-4bit"

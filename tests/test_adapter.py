@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 
-from chooseonly.adapter import (
+from codejev.adapter import (
     SYSTEM_PROMPT,
     build_messages,
     check_body,
@@ -17,7 +17,7 @@ from chooseonly.adapter import (
     summarize,
     to_artifact,
 )
-from chooseonly.contracts import Action, Brief, Kind, content_hash
+from codejev.contracts import Action, Brief, Kind, content_hash
 
 PLAIN_BRIEF = Brief(instruction="给 f 加上类型注解", target="app/util.py")
 

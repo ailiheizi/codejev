@@ -1,4 +1,4 @@
-# chooseonly：把选择权从模型手里拿走，交给宿主
+# codejev：把选择权从模型手里拿走，交给宿主
 
 > **English**: When a task is fixed enough, don't let the model write what it can *choose*.
 > The host enumerates the candidates; a tiny model only returns an id; the host assembles
@@ -10,6 +10,14 @@
 **从宿主给的候选里选一个**。它不规划、不解释、不诊断、不决定路径、不批准写入。
 
 这个仓库把这条主张**量出来**了，包括它在哪里成立、在哪里不成立。
+
+> **关键词**：Jev · System One · RLCD · 无文字生成的选择器 · 候选选择 ·
+> 本地小模型 · Apple Silicon / MLX · 代码生成 · 决策模型 · 结构化输出
+
+**和 Jev 的关系**：这是一套 **Jev / System One 式的选择架构在代码场景下的实现与实测**。
+宿主枚举代码候选并掌握 id，选择器（[Jev](https://typesafe.ai) / DeepSeek Flash /
+本地 Qwen1.5B / LFM2.5-350M）只回一个 id 或 `NONE`，宿主确定性组装。
+四个执行器都在同一份候选页上跑过，数字见下。
 
 ## 先看证据
 
@@ -111,11 +119,11 @@ export TYPESAFE_API_KEY=...
 .venv/bin/python -m bench.jev_batch_probe    # 真实源码候选池 15 条
 
 # CLI：生成路线与槽位级选择路线
-.venv/bin/python -m chooseonly.cli ask    --workspace /path/to/proj --target app/users.py \
+.venv/bin/python -m codejev.cli ask    --workspace /path/to/proj --target app/users.py \
   --instruction "只保留 active 为真的项，返回 id 和 name" --dry-run
-.venv/bin/python -m chooseonly.cli select --workspace /path/to/proj --target app/users.py \
+.venv/bin/python -m codejev.cli select --workspace /path/to/proj --target app/users.py \
   --function active_users --instruction "只保留 active 为真的项" --dry-run
-.venv/bin/python -m chooseonly.cli check
+.venv/bin/python -m codejev.cli check
 ```
 
 ## 成本（按实测 token 数与官方标价）
@@ -132,7 +140,7 @@ Jev 在"选择"这个角色上比 API 生成模型便宜约 3–6 倍，但**它
 ## 代码结构
 
 ```text
-chooseonly/
+codejev/
   contracts.py     共享形状：Brief / Artifact / 内容哈希 / 路径解析
   adapter.py       包装正文、生成 diff、完整性检查
   gate.py          确认门：审批绑定目标与内容哈希，内容变了旧确认自动失效

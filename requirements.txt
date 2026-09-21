@@ -1,8 +1,8 @@
-# chooseonly 依赖记录（由 .venv 的 `python -m pip list --format=freeze` 导出，按用途分组）
+# codejev 依赖记录（由 .venv 的 `python -m pip list --format=freeze` 导出，按用途分组）
 #
 # 为什么用 requirements.txt 而不是 pyproject.toml：
 #   1. 本项目不是被安装的包：仓库里没有打包元数据，也没有 console_scripts，
-#      代码是从仓库根目录用 `python -m chooseonly.cli ...` / `python -m bench.xxx` 跑的
+#      代码是从仓库根目录用 `python -m codejev.cli ...` / `python -m bench.xxx` 跑的
 #      （依赖 CWD 落在 sys.path 上）。pyproject.toml 会引入 name/version/build-backend
 #      这些仓库里不存在的概念，并暗示 `pip install -e .` 这种本项目并不使用的流程。
 #   2. docs/11-measured-results.md:454 已经用 pin 的形式记录过依赖
@@ -16,13 +16,13 @@
 #
 # 只读复核命令：
 #   .venv/bin/python -m pip list --format=freeze
-#   .venv/bin/python -m chooseonly.cli check     # 不加载权重
+#   .venv/bin/python -m codejev.cli check     # 不加载权重
 #   .venv/bin/python -m pytest -q           # 全部离线，不加载权重
 
 # ===== 1. 运行必需：本项目代码直接 import 或直接驱动的 =====
-libcst==1.9.0            # chooseonly/decide.py：ast 提取候选 + libcst 组装
-mlx-lm==0.31.3           # chooseonly/model.py 的 MLXEngine；bench/*.py 也直接用它
-mlx==0.32.2              # chooseonly/model.py:91 `import mlx.core as mx`；由 mlx-lm 要求，docs 里也钉此版本
+libcst==1.9.0            # codejev/decide.py：ast 提取候选 + libcst 组装
+mlx-lm==0.31.3           # codejev/model.py 的 MLXEngine；bench/*.py 也直接用它
+mlx==0.32.2              # codejev/model.py:91 `import mlx.core as mx`；由 mlx-lm 要求，docs 里也钉此版本
 mlx-metal==0.32.2        # mlx 在 macOS/Apple Silicon 上的平台包（mlx 要求 mlx-metal==0.32.2）
 
 # ===== 2. 运行必需：上面这些依赖带进来的间接包（pin 住才能真正复现）=====
@@ -67,13 +67,13 @@ pluggy==1.6.0
 
 # ===== 4. 可选 A：扩散后端对照（bench/diffusion_probe.py）=====
 # 只有跑 `python -m bench.diffusion_probe --backend diffusion` 才需要；
-# 本地默认路径（chooseonly/model.py → mlx-lm）不 import mlx_vlm，所以它是可选依赖。
+# 本地默认路径（codejev/model.py → mlx-lm）不 import mlx_vlm，所以它是可选依赖。
 mlx-vlm==0.7.1
 mlx-audio==0.5.4         # 由 mlx-vlm 要求（音频/多模态子模块）
 llguidance==1.8.0        # 由 mlx-vlm 要求
 
 # ===== 5. 可选 A 的间接包：只在多模态/音频那条路上被带进来 =====
-# 这些包在本项目 chooseonly/、bench/、tests/ 里没有任何 import，
+# 这些包在本项目 codejev/、bench/、tests/ 里没有任何 import，
 # 也不会被 mlx-lm 或 libcst 拉起——只在装了 mlx-vlm 之后才存在。
 # 不带第 4、5 组，核心两条路线（ask / select）与全部测试都能正常跑。
 fastapi==0.141.1         # ← mlx-vlm 要求；只服务于 mlx-vlm 的 server
@@ -97,7 +97,7 @@ annotated-types==0.8.0   # ← pydantic
 typing-inspection==0.4.4 # ← fastapi / pydantic
 
 # 说明：
-#   * 第 1、2 组是跑通 ask / select 与 `chooseonly.cli check` 的最小集合；
+#   * 第 1、2 组是跑通 ask / select 与 `codejev.cli check` 的最小集合；
 #     第 3 组是跑 tests/ 的增量；第 4、5 组合起来才是扩散对照的完整增量。
 #   * opencv-python / fastapi / uvicorn / httpx 常被误当成“项目依赖”：
 #     其中 httpx 实际来自 huggingface_hub，属第 2 组（运行必需）；

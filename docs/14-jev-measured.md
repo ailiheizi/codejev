@@ -23,7 +23,7 @@
 | `answers.<名>.probabilities` / `confidence` | **我们没有** ← 校准置信度 |
 | 一次请求多个 `questions` | `decide.py` 的多槽位 |
 
-所以接入是**加一个执行器**，不改协议、不改宿主边界。实现见 `chooseonly/jev_engine.py`
+所以接入是**加一个执行器**，不改协议、不改宿主边界。实现见 `codejev/jev_engine.py`
 （15 条离线测试，用假 opener，不联网）。
 
 ## 实测一：手写候选页 4 条任务 —— 4/4
@@ -55,7 +55,7 @@ Jev 是选择器，能对当前候选页整体说"都不满足"。
 
 ## 实测二：真实源码候选池 15 条任务 —— 原始 12/15，核对后 **15/15**
 
-候选池不是手写的，而是从真实文件 `chooseonly/candidate.py` 用 `ast` 枚举出来的函数。
+候选池不是手写的，而是从真实文件 `codejev/candidate.py` 用 `ast` 枚举出来的函数。
 
 原始结果：**12/15（80%）**。但有 3 条"失败"经核对**全是我的枚举器的问题，不是 Jev 的问题**：
 
@@ -63,7 +63,7 @@ Jev 是选择器，能对当前候选页整体说"都不满足"。
 | --- | --- | --- | --- |
 | 把候选页里的短要求排成提示行 | `_bullet_lines` | `build_selection_messages` | 期望的函数**以 `_` 开头，被我的枚举器跳过了**——它根本不在池里。Jev 选了池里最接近的 |
 | 去掉包住单行标量的围栏 | `_unwrap_scalar` | `parse_choice` | 同上，不在池里。而 `parse_choice` **恰好就是调用它的那个函数** |
-| 把对话控制符从正文清掉 | `clean_body` | **`NONE`** | 该函数在 `chooseonly/model.py`，**不在候选文件里**。**Jev 答 NONE 是对的** |
+| 把对话控制符从正文清掉 | `clean_body` | **`NONE`** | 该函数在 `codejev/model.py`，**不在候选文件里**。**Jev 答 NONE 是对的** |
 
 **所以实际是 15/15。** 而且这现场演示了那个压力测试的结论：
 
@@ -146,7 +146,7 @@ DeepSeek 官方定价（api-docs.deepseek.com，deepseek-flash）：输入缓存
 ## 怎么复核
 
 ```bash
-cd chooseonly
+cd codejev
 .venv/bin/python -m pytest tests/test_jev_engine.py -q      # 15 条离线测试，不联网
 export TYPESAFE_API_KEY=...                                  # 直连，不要挂代理
 .venv/bin/python -m bench.jev_probe                          # 手写候选页 4 条

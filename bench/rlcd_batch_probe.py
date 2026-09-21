@@ -186,7 +186,7 @@ def main() -> int:
         picked, score_seconds, calls = constrained_score(model, tokenizer, prefix, values)
         ar_text, ar_seconds = autoregressive(model, tokenizer, prefix)
         # 模型会带 <|im_end|> 等控制符，用项目自己的 clean_body 去掉再比对
-        from chooseonly.model import clean_body
+        from codejev.model import clean_body
 
         ar_clean = clean_body(ar_text).strip().strip("`").split()[0].strip("\"'.,") if ar_text.strip() else ""
         score_pass += int(picked == expected)

@@ -20,9 +20,9 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from chooseonly.adapter import to_artifact
-from chooseonly.contracts import Action, Brief, Kind
-from chooseonly.model import MLXEngine, Stats, clean_body
+from codejev.adapter import to_artifact
+from codejev.contracts import Action, Brief, Kind
+from codejev.model import MLXEngine, Stats, clean_body
 
 from bench.compare import (
     BENCH_SOURCE,
@@ -57,7 +57,7 @@ class DiffStats(Stats):
 
 
 class DiffusionEngine:
-    """用 mlx-vlm 驱动 Nemotron-Labs-Diffusion；接口与 chooseonly.model.Engine 一致。"""
+    """用 mlx-vlm 驱动 Nemotron-Labs-Diffusion；接口与 codejev.model.Engine 一致。"""
 
     def __init__(self, model_path: str = DIFFUSION_MODEL, generation_mode: str = "diffusion",
                  gen_kwargs: dict | None = None) -> None:

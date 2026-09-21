@@ -2,14 +2,14 @@
 
 要回答的问题（数字全部来自本机真跑）：
 
-1. 顺序调用（现有生产路径 chooseonly.model.MLXEngine，一次一个请求）与批处理
+1. 顺序调用（现有生产路径 codejev.model.MLXEngine，一次一个请求）与批处理
    （N 个请求放进同一次前向）各自的墙钟时间、每次调用时间。
 2. 两种模式的总输出 token / 总秒数：解码吞吐到底随批大小上升，还是停在
    ~110 tok/s（GPU 已饱和）。
 3. 答案一致性：温度 0 下批处理的答案必须与顺序调用**逐字相同**。不同就说明
    填充 / mask 错了——脚本会逐条报告哪一个请求的答案不一致。
 4. 答案正确性：每条答案都走项目现有的运行时检查——取出所选 id，用
-   chooseonly.decide.assemble 组装，真的 exec 并调用函数，核对过滤结果与返回字段
+   codejev.decide.assemble 组装，真的 exec 并调用函数，核对过滤结果与返回字段
    恰好等于要求（不是看代码像不像）。
 5. 前缀共享：多个请求共享同一段长上下文时，把共享前缀只 prefill 一次
    （复用 KV），省了多少；以及"在错误位置上读答案"会得到什么，作为
@@ -32,7 +32,7 @@
     HF_HUB_OFFLINE=1 .venv/bin/python bench/batching.py --rounds 3
     HF_HUB_OFFLINE=1 .venv/bin/python bench/batching.py --selfcheck   # 只验 mask 正确性
 
-本脚本只读现有模块，不修改任何 chooseonly 代码；模型只加载一次。
+本脚本只读现有模块，不修改任何 codejev 代码；模型只加载一次。
 """
 
 from __future__ import annotations
@@ -48,7 +48,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-if str(ROOT) not in sys.path:  # 直接以脚本方式运行时也能 import chooseonly
+if str(ROOT) not in sys.path:  # 直接以脚本方式运行时也能 import codejev
     sys.path.insert(0, str(ROOT))
 
 # 左侧填充用的 token id（Qwen 里就是普通 token，被 mask 挡住，不参与真实位置）。
@@ -482,8 +482,8 @@ class Request:
     task: Task
     messages: list[dict[str, str]]
     prompt_ids: list[int]
-    candidates: object  # chooseonly.decide.Candidates
-    expected: object  # chooseonly.decide.Decision
+    candidates: object  # codejev.decide.Candidates
+    expected: object  # codejev.decide.Decision
 
 
 @dataclass
@@ -536,7 +536,7 @@ class Quality:
 
 
 def encode_prompt(tokenizer, messages: list[dict[str, str]]) -> list[int]:
-    """与 chooseonly.model.MLXEngine.generate 里的编码规则逐字一致（含 add_special_tokens）。"""
+    """与 codejev.model.MLXEngine.generate 里的编码规则逐字一致（含 add_special_tokens）。"""
     prompt = tokenizer.apply_chat_template(
         messages, tokenize=False, add_generation_prompt=True
     )
@@ -640,7 +640,7 @@ def _run_body(task: Task, body: str) -> tuple[list[str], bool]:
 def check_quality(decide, request: Request, text: str) -> Quality:
     """项目现有的判断口径：解析决策 → 确定性组装 → 真的 exec、真的调用。
 
-    模型回的是决策 JSON（候选 id），代码由 chooseonly.decide.assemble 落成；所以
+    模型回的是决策 JSON（候选 id），代码由 codejev.decide.assemble 落成；所以
     "答案正确"分三步查：
     1. 决策合法，且挑中的条件/字段按真实字段名就是指令要求的那些；
     2. 组装出来的正文能 exec、能找到目标函数（assemble 自己找不到安全落点会抛）；
@@ -769,7 +769,7 @@ def _clear_mlx_cache() -> None:
 def run_batched(engine, tokenizer, requests: list[Request], max_tokens: int) -> BatchOutcome:
     """批处理：所有请求左侧填充后放进同一次前向，之后每步一次前向。"""
     import mlx.core as mx
-    from chooseonly.model import clean_body
+    from codejev.model import clean_body
     from mlx_lm.generate import generation_stream, wired_limit
     from mlx_lm.models.cache import BatchKVCache
     from mlx_lm.sample_utils import make_sampler
@@ -885,7 +885,7 @@ def run_shared_prefix(
     "必须逐序列在自己的末位读"的证据。
     """
     import mlx.core as mx
-    from chooseonly.model import clean_body
+    from codejev.model import clean_body
     from mlx_lm.generate import generation_stream, wired_limit
     from mlx_lm.models.cache import BatchKVCache, KVCache
     from mlx_lm.sample_utils import make_sampler
@@ -1072,14 +1072,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--rounds", type=int, default=3, help="每种批大小重复几轮（取 min 与均值）")
     parser.add_argument("--batches", default="1,2,4,8", help="要测的批大小，逗号分隔")
     parser.add_argument("--max-tokens", type=int, default=DEFAULT_MAX_TOKENS)
-    parser.add_argument("--model", default=None, help="模型目录（默认用 chooseonly.model.DEFAULT_MODEL）")
+    parser.add_argument("--model", default=None, help="模型目录（默认用 codejev.model.DEFAULT_MODEL）")
     parser.add_argument("--shared-batch", type=int, default=4, help="前缀共享实验的批大小")
     parser.add_argument("--skip-prefix", action="store_true", help="跳过前缀共享实验")
     parser.add_argument("--selfcheck", action="store_true", help="只跑正确性自检（小批、少轮）")
     args = parser.parse_args(argv)
 
-    decide = import_project_module("chooseonly.decide")
-    model_mod = import_project_module("chooseonly.model")
+    decide = import_project_module("codejev.decide")
+    model_mod = import_project_module("codejev.model")
 
     batch_sizes = [int(x) for x in args.batches.split(",") if x.strip()]
     rounds = max(args.rounds, 1)

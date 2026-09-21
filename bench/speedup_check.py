@@ -2,11 +2,11 @@
 
 本轮落地的两处改动：
 
-1. `chooseonly/model.py` 直驱 `mlx_lm.generate_step`，只在最后 decode 一次。
+1. `codejev/model.py` 直驱 `mlx_lm.generate_step`，只在最后 decode 一次。
    旧调用 `mlx_lm.generate`（内部 `stream_generate`）每次都会新建一个流式
    detokenizer（`TokenizerWrapper.detokenizer` 是 `return self._detokenizer_class(self)`，
    构造要遍历 15 万条词表，不缓存）。
-2. `chooseonly/decide.py` 的决策契约换成精简 JSON `{"f": ..., "r": [...]}`，
+2. `codejev/decide.py` 的决策契约换成精简 JSON `{"f": ..., "r": [...]}`，
    旧的长键仍然接受（向后兼容）。
 
 本脚本回答三件事，全部本机真跑：
@@ -36,12 +36,12 @@ from collections.abc import Callable
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-if str(ROOT) not in sys.path:  # 直接以脚本方式运行时，也能 import chooseonly
+if str(ROOT) not in sys.path:  # 直接以脚本方式运行时，也能 import codejev
     sys.path.insert(0, str(ROOT))
 # 只用本机模型目录：整个脚本不需要联网。
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
-from chooseonly.decide import (  # noqa: E402 - 先修好 sys.path 再导入
+from codejev.decide import (  # noqa: E402 - 先修好 sys.path 再导入
     FUNCTION_ID,
     Candidates,
     Decision,
@@ -51,8 +51,8 @@ from chooseonly.decide import (  # noqa: E402 - 先修好 sys.path 再导入
     parse_decision,
     run_decision,
 )
-from chooseonly.gate import Gate  # noqa: E402
-from chooseonly.model import DEFAULT_MODEL, MLXEngine, clean_body  # noqa: E402
+from codejev.gate import Gate  # noqa: E402
+from codejev.model import DEFAULT_MODEL, MLXEngine, clean_body  # noqa: E402
 from bench.compare import (  # noqa: E402
     BENCH_SOURCE,
     EXPECTED_FIELDS,
@@ -220,7 +220,7 @@ def print_table(headers: list[str], rows: list[list[str]]) -> None:
 def end_to_end(engine: MLXEngine, candidates: Candidates, expected: Decision) -> bool:
     """在临时工作区真跑一次选择路线，把写出的文件 exec 起来按运行时行为检查。"""
     print("=== 正确性：选择路线端到端（临时工作区，真实模型调用）===")
-    with tempfile.TemporaryDirectory(prefix="chooseonly-speedup-") as scratch:
+    with tempfile.TemporaryDirectory(prefix="codejev-speedup-") as scratch:
         workspace = Path(scratch)
         (workspace / "users.py").write_text(BENCH_SOURCE, encoding="utf-8")
 

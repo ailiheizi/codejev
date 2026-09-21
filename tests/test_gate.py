@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from chooseonly.contracts import Action, Kind, content_hash, make_artifact
-from chooseonly.gate import Approval, Gate, GateError, Proposal
+from codejev.contracts import Action, Kind, content_hash, make_artifact
+from codejev.gate import Approval, Gate, GateError, Proposal
 
 
 def make_proposal_artifact(target: str, body: str):

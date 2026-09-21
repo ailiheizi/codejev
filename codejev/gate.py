@@ -13,7 +13,7 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
-from chooseonly.contracts import Artifact, content_hash, resolve_target
+from codejev.contracts import Artifact, content_hash, resolve_target
 
 
 class GateError(Exception):

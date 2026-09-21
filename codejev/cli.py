@@ -8,9 +8,9 @@
 两条产出路径：ask 让小模型自由写正文；select 走 decide.py 的选择式路径，
 宿主提取候选、小模型只选 id、宿主确定性组装，适合固定任务形状。
 
-    .venv/bin/python -m chooseonly.cli ask -i “只保留 active 的项” -t app/users.py
-    .venv/bin/python -m chooseonly.cli select -i “只保留 active 的项” -t app/users.py
-    .venv/bin/python -m chooseonly.cli check
+    .venv/bin/python -m codejev.cli ask -i “只保留 active 的项” -t app/users.py
+    .venv/bin/python -m codejev.cli select -i “只保留 active 的项” -t app/users.py
+    .venv/bin/python -m codejev.cli check
 """
 
 from __future__ import annotations
@@ -21,11 +21,11 @@ import time
 from dataclasses import replace
 from pathlib import Path
 
-from chooseonly.adapter import display, render_diff, summarize, to_artifact
-from chooseonly.contracts import Action, Brief, Kind, resolve_target
-from chooseonly.decide import DecisionError, describe_decision, run_decision
-from chooseonly.gate import Gate, GateError
-from chooseonly.model import DEFAULT_MODEL, MLXEngine, Stats, request_body
+from codejev.adapter import display, render_diff, summarize, to_artifact
+from codejev.contracts import Action, Brief, Kind, resolve_target
+from codejev.decide import DecisionError, describe_decision, run_decision
+from codejev.gate import Gate, GateError
+from codejev.model import DEFAULT_MODEL, MLXEngine, Stats, request_body
 
 
 def _make_engine(args: argparse.Namespace) -> MLXEngine:
@@ -245,7 +245,7 @@ def run_check(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     """构造解析器：ask 自由生成，select 选择式产出，check 环境自检。"""
     parser = argparse.ArgumentParser(
-        prog="chooseonly",
+        prog="codejev",
         description="大模型发短指令，小模型快速产出；展示差异，确认后才写入。",
     )
     sub = parser.add_subparsers(dest="command", required=True, metavar="{ask,select,check}")

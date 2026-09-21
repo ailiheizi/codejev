@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from chooseonly.candidate import (
+from codejev.candidate import (
     CandidateChoice,
     CandidateError,
     CandidatePage,
@@ -16,7 +16,7 @@ from chooseonly.candidate import (
     parse_choice,
     validate_page,
 )
-from chooseonly.model import ScriptedEngine
+from codejev.model import ScriptedEngine
 
 
 PYTHON_TASK = CodeTask(

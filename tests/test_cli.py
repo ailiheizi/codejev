@@ -11,9 +11,9 @@ from pathlib import Path
 
 import pytest
 
-from chooseonly import cli
-from chooseonly.fixtures import USERS_MODULE
-from chooseonly.model import ScriptedEngine, clean_body
+from codejev import cli
+from codejev.fixtures import USERS_MODULE
+from codejev.model import ScriptedEngine, clean_body
 
 BODY = "def active(users):\n    return [u for u in users if u['active']]"
 BODY2 = "def active(users):\n    return [u for u in users if u['active'] and u['id']]"

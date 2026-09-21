@@ -1,0 +1,16 @@
+endpoint=https://api.typesafe.ai/v1/systemone  model=jev-latest
+候选页（与 LFM2.5 / DeepSeek Flash 对照用的是同一份）：
+  [0] filter_and_project：过滤 active 为真的行，并按 id、name 投影，保持原顺序。
+  [1] sort_rows：按 score 从高到低排序 rows，保留每行的完整内容。
+  [2] group_and_count：按 category 分组计数，返回 category 到数量的映射。
+
+需求                                     期望    Jev     置信度       耗时  结果
+只保留 active 为真的项，返回 id 和 name，保持原        0      0    0.84    0.74s  ✓（要的是 过滤+裁字段）
+把结果按 score 从高到低排序，保留完整记录。               1      1    0.92    0.80s  ✓（要的是 排序）
+按 category 分组统计数量，返回映射。                 2      2    0.86    0.78s  ✓（要的是 分组计数）
+按 owner_id 关联用户和订单，返回合并记录。           NONE   NONE    1.00    0.74s  ✓（要的是 候选页里没有这个能力）
+
+Jev：4/4
+延迟：中位 0.78s｜范围 0.74-0.80s（含代理）
+
+对照：DeepSeek Flash 5/5｜本地 Qwen1.5B 2-3/4｜LFM2.5-350M 1/4（恒定输出 2）

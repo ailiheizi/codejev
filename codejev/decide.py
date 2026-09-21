@@ -28,8 +28,8 @@ import libcst as cst
 from libcst import matchers as cstm
 from libcst.metadata import CodeRange, MetadataWrapper, PositionProvider
 
-from chooseonly.contracts import Action, Artifact, Kind, make_artifact, normalize_body, strip_code_fence
-from chooseonly.model import Engine
+from codejev.contracts import Action, Artifact, Kind, make_artifact, normalize_body, strip_code_fence
+from codejev.model import Engine
 
 # 决策只回一个 JSON 对象，几十个 token 足够；提示短是这条路径的全部意义。
 DECISION_MAX_TOKENS = 128
@@ -598,7 +598,7 @@ def run_decision(
 
     模型只回一个短 JSON 决策，正文全部由宿主组装；返回的 Artifact 已由宿主
     算好 content_hash（make_artifact 会去掉首尾空行），交给调用方按 Gate
-    流程确认后原样写入。engine 只依赖 chooseonly.model.Engine 协议，测试用
+    流程确认后原样写入。engine 只依赖 codejev.model.Engine 协议，测试用
     ScriptedEngine，不加载权重。
     """
     candidates = extract(source, function_name)

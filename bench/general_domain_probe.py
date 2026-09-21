@@ -1,11 +1,11 @@
 """域无关候选页原型：验证"宿主枚举候选 → 模型只回一个候选 id → 宿主物化"能推广到
 第二个域（Python 函数与变量），并量化真正的瓶颈——宿主枚举。
 
-沿用现有协议，不改 chooseonly/ 下任何文件：
-- 候选页仍是 `chooseonly.candidate.CandidatePage` / `CodeCandidate`；
+沿用现有协议，不改 codejev/ 下任何文件：
+- 候选页仍是 `codejev.candidate.CandidatePage` / `CodeCandidate`；
 - 选择仍是 `choose_candidate` + `parse_choice` 严格解析；
 - 物化仍是 `materialize`；
-- 执行器仍是 `chooseonly.api_engine.OpenAICompatibleEngine`，配置照抄
+- 执行器仍是 `codejev.api_engine.OpenAICompatibleEngine`，配置照抄
   `bench/candidate_api_probe.py` 的 CC Switch 读法（不打印 key）。
 
 A 部分：把 ast 枚举出的函数与名字装进现有候选页，跑 15 条任务，判据全部是运行时行为：
@@ -37,8 +37,8 @@ from types import ModuleType
 from typing import Callable, Mapping, Sequence
 
 from bench.provider_config import load_provider
-from chooseonly.api_engine import APIConfig, APIEngineError, OpenAICompatibleEngine
-from chooseonly.candidate import (
+from codejev.api_engine import APIConfig, APIEngineError, OpenAICompatibleEngine
+from codejev.candidate import (
     CandidateChoice,
     CandidateError,
     CandidatePage,
@@ -47,17 +47,17 @@ from chooseonly.candidate import (
     choose_candidate,
     materialize,
 )
-from chooseonly.model import ScriptedEngine, Stats
+from codejev.model import ScriptedEngine, Stats
 from bench import domain_enum as de
 from bench import domain_runtime as dr
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_SOURCE = REPO_ROOT / "chooseonly" / "candidate.py"
+DEFAULT_SOURCE = REPO_ROOT / "codejev" / "candidate.py"
 
 DEFAULT_MODEL = "deepseek-v4-flash"
 
 # 宿主发放候选 id 的盐：顺序只由宿主的这个常量决定，与源码顺序、出现位置无关。
-ID_SALT = "chooseonly/general-domain/v1"
+ID_SALT = "codejev/general-domain/v1"
 MAX_TOKENS = 16
 
 
@@ -679,7 +679,7 @@ class BuiltPage:
 
 
 def prompt_chars(task: CodeTask, page: CandidatePage) -> int:
-    from chooseonly.candidate import build_selection_messages
+    from codejev.candidate import build_selection_messages
 
     messages = build_selection_messages(task, page)
     return sum(len(message["content"]) for message in messages)
@@ -1364,7 +1364,7 @@ def part_b_other_files() -> None:
 
     heading("B3 换几份真实文件再查一遍（本体源文件里没有的结构）")
     targets = [
-        REPO_ROOT / "chooseonly" / "decide.py",
+        REPO_ROOT / "codejev" / "decide.py",
         REPO_ROOT / "bench" / "diffusion_probe.py",
         REPO_ROOT / "tests" / "test_cli.py",
     ]
@@ -1399,7 +1399,7 @@ def part_b_other_files() -> None:
     print()
     print("跨全仓重名函数（名字不能当候选标识，必须用 qualname 或宿主 id）：")
     seen: dict[str, set[str]] = {}
-    for path in sorted((*REPO_ROOT.glob("chooseonly/*.py"), *REPO_ROOT.glob("bench/*.py"), *REPO_ROOT.glob("tests/*.py"))):
+    for path in sorted((*REPO_ROOT.glob("codejev/*.py"), *REPO_ROOT.glob("bench/*.py"), *REPO_ROOT.glob("tests/*.py"))):
         enumeration = de.enumerate_source(path, "python312")
         for entry in enumeration.functions:
             seen.setdefault(entry.name, set()).add(f"{path.name}:{entry.qualname}:{entry.lineno}")
@@ -1455,12 +1455,12 @@ def part_b_materialize_limits(source_module: ModuleType, source: Path) -> None:
 
     # 反例 3：装饰器行不在 ast.get_source_segment 的段里。
     decorated = []
-    for path in sorted(REPO_ROOT.glob("chooseonly/*.py")):
+    for path in sorted(REPO_ROOT.glob("codejev/*.py")):
         enumeration = de.enumerate_source(path, "python312")
         for entry in enumeration.functions:
             if entry.decorators:
                 decorated.append((path, entry))
-    print(f"  3) 带装饰器的函数/方法：chooseonly 包内 {len(decorated)} 个；源码段不含装饰器行")
+    print(f"  3) 带装饰器的函数/方法：codejev 包内 {len(decorated)} 个；源码段不含装饰器行")
     for path, entry in decorated[:3]:
         first_line = entry.source.splitlines()[0].strip()
         print(
@@ -1596,7 +1596,7 @@ def part_b_not_verified() -> None:
     heading("B8 这一轮没有验证的部分")
     for line in (
         "只测了 Python 3.12.13 一个解释器：推导式目标的归属（PEP 709 内联）在 3.11 及更早相反。",
-        "只有 chooseonly/candidate.py 一个主域源文件；B3 的其它文件只做静态普查，没跑任务。",
+        "只有 codejev/candidate.py 一个主域源文件；B3 的其它文件只做静态普查，没跑任务。",
         "变量域只覆盖了 3 个函数作用域（parse_choice / validate_page / build_selection_messages）。",
         "运行时观测是「若干见证调用的并集」，不是完备的局部集合；条件绑定的名字可能没被任何见证触发。",
         "任务规范化（用户原话 → CodeTask）由本探针手写，没有验证大模型那一步。",
@@ -1834,10 +1834,10 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit(f"源文件不存在：{source}")
 
     digest = hashlib.sha256(source.read_bytes()).hexdigest()[:16]
-    heading("chooseonly 域无关候选页原型：第二个域 = Python 函数与变量")
+    heading("codejev 域无关候选页原型：第二个域 = Python 函数与变量")
     print(f"source={source.relative_to(REPO_ROOT)} sha256[:16]={digest} lines={len(source.read_text(encoding='utf-8').splitlines())}")
     print(f"python={sys.version.split()[0]}")
-    print("protocol=chooseonly.candidate（CandidatePage/CodeCandidate/choose_candidate/materialize，未改动）")
+    print("protocol=codejev.candidate（CandidatePage/CodeCandidate/choose_candidate/materialize，未改动）")
     if args.no_api:
         print("provider=未使用（--no-api）")
     else:
@@ -1862,8 +1862,8 @@ def main(argv: list[str] | None = None) -> int:
         name_pages[task_def.scope] = built
         _page_names_cache[task_def.scope] = tuple(candidate.name for candidate in built.page.candidates)
 
-    decide = REPO_ROOT / "chooseonly" / "decide.py"
-    other = [REPO_ROOT / "chooseonly" / "decide.py", REPO_ROOT / "chooseonly" / "api_engine.py"]
+    decide = REPO_ROOT / "codejev" / "decide.py"
+    other = [REPO_ROOT / "codejev" / "decide.py", REPO_ROOT / "codejev" / "api_engine.py"]
     other = [path for path in other if path.exists() and path != source]
     other_enumerations = [de.enumerate_source(path, "python312") for path in other]
     flat_pages = [build_flat_name_page(profile)]

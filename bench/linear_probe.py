@@ -22,8 +22,8 @@ import ast
 import time
 from pathlib import Path
 
-from chooseonly.adapter import build_messages, to_artifact
-from chooseonly.contracts import Action, Brief, Kind
+from codejev.adapter import build_messages, to_artifact
+from codejev.contracts import Action, Brief, Kind
 
 MODELS_ROOT = Path(__file__).resolve().parent.parent / "models"
 

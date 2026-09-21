@@ -4,7 +4,7 @@
 
 本文保留此前实际查看的源码事实，便于按需参考，不是当前方案的实现清单。当前主线是大模型短指令、小模型产出、大模型给用户简短结论；不要求建设检索、训练回收或复杂审批系统。
 
-本次文档工作开始时，当前 `chooseonly` 目录没有源代码。本次没有遍历用户整块磁盘，也没有声称用户其他本地项目缺少代码。已有公开仓库已经能提供几个很具体的起点。
+本次文档工作开始时，当前 `codejev` 目录没有源代码。本次没有遍历用户整块磁盘，也没有声称用户其他本地项目缺少代码。已有公开仓库已经能提供几个很具体的起点。
 
 ## 1. 查了什么
 
@@ -16,7 +16,7 @@
 
 ## 2. Loom：优先继承契约与确定性生成
 
-来源：[ailiheizi/loom](https://github.com/ailiheizi/loom)。本次读取 archive 的 commit 前缀为 `c299faf`，本地快照目录为 `/tmp/chooseonly-repo-review/ailiheizi__loom/src/ailiheizi-loom-c299faf/`。未在这次调查中解析完整 commit；下列链接固定到该已知前缀。
+来源：[ailiheizi/loom](https://github.com/ailiheizi/loom)。本次读取 archive 的 commit 前缀为 `c299faf`，本地快照目录为 `/tmp/codejev-repo-review/ailiheizi__loom/src/ailiheizi-loom-c299faf/`。未在这次调查中解析完整 commit；下列链接固定到该已知前缀。
 
 | 已查看文件 | 实际机制 | 对新项目的贡献 |
 | --- | --- | --- |
@@ -41,7 +41,7 @@
 
 ## 3. universal-selector：负责路由和召回
 
-来源：[ailiheizi/universal-selector](https://github.com/ailiheizi/universal-selector)。本次读取 archive 的 commit 前缀为 `f014818`，本地快照目录为 `/tmp/chooseonly-repo-review/ailiheizi__universal-selector/src/ailiheizi-universal-selector-f014818/`。未在这次调查中解析完整 commit。
+来源：[ailiheizi/universal-selector](https://github.com/ailiheizi/universal-selector)。本次读取 archive 的 commit 前缀为 `f014818`，本地快照目录为 `/tmp/codejev-repo-review/ailiheizi__universal-selector/src/ailiheizi-universal-selector-f014818/`。未在这次调查中解析完整 commit。
 
 实际查看：[README.md](https://github.com/ailiheizi/universal-selector/blob/f014818/README.md)、[src/selector.py](https://github.com/ailiheizi/universal-selector/blob/f014818/src/selector.py)。
 

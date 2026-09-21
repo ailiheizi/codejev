@@ -26,14 +26,14 @@ import urllib.request
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
-from chooseonly.candidate import (
+from codejev.candidate import (
     CandidateChoice,
     CandidateError,
     CandidatePage,
     CodeTask,
     validate_page,
 )
-from chooseonly.model import Stats
+from codejev.model import Stats
 
 ENDPOINT = "https://api.typesafe.ai/v1/systemone"
 MODEL = "jev-latest"

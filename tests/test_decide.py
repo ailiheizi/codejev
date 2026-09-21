@@ -13,8 +13,8 @@ from dataclasses import replace
 
 import pytest
 
-from chooseonly.contracts import Action, Kind, content_hash, normalize_body
-from chooseonly.decide import (
+from codejev.contracts import Action, Kind, content_hash, normalize_body
+from codejev.decide import (
     DECISION_SYSTEM_PROMPT,
     Candidate,
     Candidates,
@@ -27,14 +27,14 @@ from chooseonly.decide import (
     parse_decision,
     run_decision,
 )
-from chooseonly.fixtures import (
+from codejev.fixtures import (
     BROKEN_MODULE,
     NO_FUNCTION_MODULE,
     ORDERS_MODULE,
     PRODUCTS_MODULE,
     USERS_MODULE,
 )
-from chooseonly.model import ScriptedEngine
+from codejev.model import ScriptedEngine
 
 TARGET = "app/users.py"
 

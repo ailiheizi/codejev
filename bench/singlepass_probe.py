@@ -13,7 +13,7 @@ import time
 import mlx.core as mx
 from mlx_lm import load
 
-from chooseonly.decide import extract
+from codejev.decide import extract
 
 MODEL = "models/Qwen2.5-Coder-1.5B-Instruct-4bit"
 

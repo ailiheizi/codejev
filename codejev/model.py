@@ -11,8 +11,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Protocol
 
-from chooseonly.adapter import build_messages
-from chooseonly.contracts import Brief
+from codejev.adapter import build_messages
+from codejev.contracts import Brief
 
 DEFAULT_MODEL = str(
     Path(__file__).resolve().parent.parent / "models" / "Qwen2.5-Coder-1.5B-Instruct-4bit"

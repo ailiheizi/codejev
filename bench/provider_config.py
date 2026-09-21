@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import os
 
-from chooseonly.api_engine import APIConfig
+from codejev.api_engine import APIConfig
 
 DEFAULT_MODEL = "deepseek-chat"
 

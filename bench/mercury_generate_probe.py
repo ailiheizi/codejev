@@ -17,8 +17,8 @@ import time
 import urllib.error
 import urllib.request
 
-from chooseonly.adapter import to_artifact
-from chooseonly.contracts import Action, Brief, Kind
+from codejev.adapter import to_artifact
+from codejev.contracts import Action, Brief, Kind
 from bench.compare import BENCH_SOURCE, TASK_FUNCTION, TASK_INSTRUCTION, check_runtime_behaviour
 
 BASE_URL = "https://api.inceptionlabs.ai/v1/chat/completions"
@@ -65,7 +65,7 @@ def experiment_a(trials: int = 3) -> None:
         context=BENCH_SOURCE,
         original=BENCH_SOURCE,
     )
-    from chooseonly.adapter import build_messages
+    from codejev.adapter import build_messages
 
     passed = 0
     for index in range(trials):

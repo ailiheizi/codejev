@@ -14,10 +14,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 
-from chooseonly.contracts import Action, Artifact, Brief, Kind
-from chooseonly.decide import Candidates, Decision, DecisionError, assemble, extract, parse_decision
-from chooseonly.adapter import to_artifact
-from chooseonly.model import Engine, Stats, request_body
+from codejev.contracts import Action, Artifact, Brief, Kind
+from codejev.decide import Candidates, Decision, DecisionError, assemble, extract, parse_decision
+from codejev.adapter import to_artifact
+from codejev.model import Engine, Stats, request_body
 
 # 固定任务：把一个返回全部字段的函数改成只返回选定字段。
 TASK_INSTRUCTION = "修改函数：只保留 active 为真的项，返回 id 和 name，保持原顺序，其他不变。"
@@ -212,7 +212,7 @@ def run_select(engine: Engine, source: str, trials: int) -> Report:
             )
             continue
 
-        from chooseonly.decide import build_decision_prompt
+        from codejev.decide import build_decision_prompt
 
         messages = build_decision_prompt(TASK_INSTRUCTION, candidates)
         raw, stats = engine.generate(messages, max_tokens=64)
@@ -298,7 +298,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--model", default=None)
     args = parser.parse_args(argv)
 
-    from chooseonly.model import MLXEngine
+    from codejev.model import MLXEngine
 
     engine = MLXEngine(args.model) if args.model else MLXEngine()
     print("加载模型...")

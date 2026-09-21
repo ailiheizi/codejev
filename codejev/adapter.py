@@ -12,7 +12,7 @@ import difflib
 import json
 import re
 
-from chooseonly.contracts import Action, Artifact, Brief, Kind, make_artifact, normalize_body
+from codejev.contracts import Action, Artifact, Brief, Kind, make_artifact, normalize_body
 
 SYSTEM_PROMPT = (
     "你只输出要写入目标文件的正文本身。\n"

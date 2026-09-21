@@ -26,9 +26,9 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from chooseonly.adapter import to_artifact
-from chooseonly.contracts import Action, Brief, Kind
-from chooseonly.decide import (
+from codejev.adapter import to_artifact
+from codejev.contracts import Action, Brief, Kind
+from codejev.decide import (
     DECISION_MAX_TOKENS,
     DECISION_SYSTEM_PROMPT,
     Decision,
@@ -38,7 +38,7 @@ from chooseonly.decide import (
     extract,
     parse_decision,
 )
-from chooseonly.model import Engine, MLXEngine, request_body
+from codejev.model import Engine, MLXEngine, request_body
 from bench.compare import (
     BENCH_SOURCE,
     EXPECTED_FIELDS,

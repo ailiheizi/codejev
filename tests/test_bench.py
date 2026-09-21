@@ -11,7 +11,7 @@ import ast
 
 import pytest
 
-from chooseonly.model import Stats
+from codejev.model import Stats
 from bench.compare import (
     BENCH_SOURCE,
     EXPECTED_FIELDS,
@@ -52,7 +52,7 @@ VALID_DECISION = '{"function": "fn0", "filter_field": "c2", "return_fields": ["f
 
 
 class StubEngine:
-    """离线替身：按预设回复返回，实现 chooseonly.model.Engine 协议，不加载模型。"""
+    """离线替身：按预设回复返回，实现 codejev.model.Engine 协议，不加载模型。"""
 
     def __init__(self, *replies: str) -> None:
         self.replies = list(replies)

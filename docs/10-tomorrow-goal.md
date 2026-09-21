@@ -28,7 +28,7 @@
 运行：
 
 ```bash
-cd chooseonly
+cd codejev
 HF_HUB_OFFLINE=1 .venv/bin/python -m bench.candidate_probe
 ```
 
@@ -47,7 +47,7 @@ accuracy=...
 
 ### 必须满足
 
-1. `chooseonly/candidate.py` 的离线协议测试通过。
+1. `codejev/candidate.py` 的离线协议测试通过。
 2. 全量测试通过：
 
    ```bash

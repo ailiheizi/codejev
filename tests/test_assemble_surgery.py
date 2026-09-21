@@ -16,7 +16,7 @@ from typing import Any
 
 import pytest
 
-from chooseonly.decide import (
+from codejev.decide import (
     Candidate,
     Candidates,
     Decision,

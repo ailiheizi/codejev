@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from chooseonly.contracts import (
+from codejev.contracts import (
     Action,
     Artifact,
     Brief,

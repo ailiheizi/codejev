@@ -16,9 +16,9 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from chooseonly.decide import extract
+from codejev.decide import extract
 
-# 与 chooseonly/fixtures.py 的 USERS_MODULE 同形状：字典取值，返回全部字段、不过滤。
+# 与 codejev/fixtures.py 的 USERS_MODULE 同形状：字典取值，返回全部字段、不过滤。
 SOURCE = '''"""用户列表示例：字典风格。"""
 
 
@@ -221,7 +221,7 @@ def main() -> None:
     text_w = max(sum(2 if ord(ch) > 0x2E7F else 1 for ch in case.phrasing) for case in CASES)
 
     lines = [
-        f"候选字段（来自 chooseonly.decide.extract）：{', '.join(vocab)}",
+        f"候选字段（来自 codejev.decide.extract）：{', '.join(vocab)}",
         "L=字面  P=换说法（同义词）  T=陷阱（否定/倒装）",
         "",
         f"{_pad('标签', label_w)}  {_pad('指令', text_w)}  {_pad('结果', 8)}  规则提取到的东西",

@@ -37,12 +37,12 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
-if str(ROOT) not in sys.path:  # 直接以脚本方式运行时，也能 import chooseonly
+if str(ROOT) not in sys.path:  # 直接以脚本方式运行时，也能 import codejev
     sys.path.insert(0, str(ROOT))
 # 只用本机模型目录：整个脚本不需要联网。
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
-from chooseonly.decide import (  # noqa: E402 - 先修好 sys.path 再导入
+from codejev.decide import (  # noqa: E402 - 先修好 sys.path 再导入
     DECISION_MAX_TOKENS,
     DECISION_SYSTEM_PROMPT,
     DecisionError,
@@ -52,7 +52,7 @@ from chooseonly.decide import (  # noqa: E402 - 先修好 sys.path 再导入
     extract,
     parse_decision,
 )
-from chooseonly.model import MLXEngine  # noqa: E402
+from codejev.model import MLXEngine  # noqa: E402
 
 MODEL_15B = ROOT / "models" / "Qwen2.5-Coder-1.5B-Instruct-4bit"
 

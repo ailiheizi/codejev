@@ -8,8 +8,8 @@ import urllib.error
 
 import pytest
 
-from chooseonly.candidate import CandidatePage, CodeCandidate, CodeTask
-from chooseonly.jev_engine import TypesafeConfig, TypesafeEngine, TypesafeError
+from codejev.candidate import CandidatePage, CodeCandidate, CodeTask
+from codejev.jev_engine import TypesafeConfig, TypesafeEngine, TypesafeError
 
 TASK = CodeTask(
     operation="filter_and_project",

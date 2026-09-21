@@ -24,7 +24,7 @@
     HF_HUB_OFFLINE=1 .venv/bin/python -m bench.piecesize --selftest   # 不加载权重
 
 本脚本只读现有模块（extract / build_decision_prompt / parse_decision / assemble 原样复用），
-不修改任何 chooseonly 代码。结果只是单机小样本观测，机器当时还有其他负载，不是通用结论。
+不修改任何 codejev 代码。结果只是单机小样本观测，机器当时还有其他负载，不是通用结论。
 """
 
 from __future__ import annotations
@@ -42,12 +42,12 @@ from pathlib import Path
 from string import Template
 
 ROOT = Path(__file__).resolve().parent.parent
-if str(ROOT) not in sys.path:  # 直接以脚本方式运行时，也能 import chooseonly
+if str(ROOT) not in sys.path:  # 直接以脚本方式运行时，也能 import codejev
     sys.path.insert(0, str(ROOT))
 
-from chooseonly.adapter import to_artifact  # noqa: E402 - 先修好 sys.path 再导入
-from chooseonly.contracts import Action, Brief, Kind  # noqa: E402
-from chooseonly.decide import (  # noqa: E402
+from codejev.adapter import to_artifact  # noqa: E402 - 先修好 sys.path 再导入
+from codejev.contracts import Action, Brief, Kind  # noqa: E402
+from codejev.decide import (  # noqa: E402
     DECISION_MAX_TOKENS,
     DECISION_SYSTEM_PROMPT,
     Decision,
@@ -57,7 +57,7 @@ from chooseonly.decide import (  # noqa: E402
     extract,
     parse_decision,
 )
-from chooseonly.model import Engine, MLXEngine, Stats, request_body  # noqa: E402
+from codejev.model import Engine, MLXEngine, Stats, request_body  # noqa: E402
 from bench.compare import looks_like_explanation, looks_truncated  # noqa: E402
 
 MODEL_15B = ROOT / "models" / "Qwen2.5-Coder-1.5B-Instruct-4bit"
@@ -829,7 +829,7 @@ def run_generate_trial(engine: Engine, spec: BSpec) -> Trial:
 
 def _brief_messages(brief: Brief) -> list[dict[str, str]]:
     """生成路线的消息：与生产路径完全一致（复用 adapter.build_messages）。"""
-    from chooseonly.adapter import build_messages
+    from codejev.adapter import build_messages
 
     return build_messages(brief)
 

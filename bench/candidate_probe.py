@@ -6,7 +6,7 @@ import json
 import time
 from pathlib import Path
 
-from chooseonly.candidate import (
+from codejev.candidate import (
     CandidateError,
     CandidatePage,
     CodeCandidate,
@@ -14,7 +14,7 @@ from chooseonly.candidate import (
     choose_candidate,
     materialize,
 )
-from chooseonly.model import MLXEngine, Stats
+from codejev.model import MLXEngine, Stats
 
 
 MODEL_PATH = (

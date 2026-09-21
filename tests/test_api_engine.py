@@ -8,8 +8,8 @@ import urllib.request
 
 import pytest
 
-from chooseonly.api_engine import APIConfig, APIEngineError, OpenAICompatibleEngine
-from chooseonly.candidate import CandidatePage, CodeCandidate, CodeTask, choose_candidate
+from codejev.api_engine import APIConfig, APIEngineError, OpenAICompatibleEngine
+from codejev.candidate import CandidatePage, CodeCandidate, CodeTask, choose_candidate
 
 
 API_KEY = "test-secret-key"

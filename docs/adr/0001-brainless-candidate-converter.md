@@ -2,7 +2,7 @@
 
 - 状态：Accepted
 - 日期：2026-09-20
-- 范围：chooseonly 的小模型执行层
+- 范围：codejev 的小模型执行层
 
 ## 背景
 
@@ -93,7 +93,7 @@ CodeTask + 必要原文
 
 ### 后续：这条闸门已经落地，四项数字已量（2026-09-20）
 
-排序槽位现在已在 `chooseonly/decide.py` 中实现并默认关闭，启用权按上文由调用方掌握：
+排序槽位现在已在 `codejev/decide.py` 中实现并默认关闭，启用权按上文由调用方掌握：
 
 ```text
 Decision(function_id, filter_field, return_fields, sort_field=None, sort_desc=False)
