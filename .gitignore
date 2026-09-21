@@ -1,0 +1,56 @@
+# az-fls 版本库忽略规则
+# 原则：源码与文档入库；虚拟环境、模型权重、实测产物、缓存一律不入库。
+# 本文件为新增文件，未修改仓库里任何已有文件。
+# 复核命令：git status --short / git check-ignore -v <路径>
+
+# ---------- 虚拟环境（本机实测约 677 MB）----------
+.venv/
+venv/
+env/
+ENV/
+
+# ---------- 本地模型权重（本机实测约 3.1 GB）----------
+# models/ 下三个目录：Qwen2.5-Coder-0.5B-Instruct-4bit、Qwen2.5-Coder-1.5B-Instruct-4bit、
+# Nemotron-Labs-Diffusion-3B-4bit。权重可重新下载，不该进版本库。
+models/
+# 兜住散落在源码目录里的权重文件
+*.gguf
+*.safetensors
+*.npz
+
+# ---------- Python 运行时产物 ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# ---------- 测试与工具缓存 ----------
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ---------- bench 实测输出产物（可复跑生成）----------
+# 只有两个脚本会写 JSON：bench/diffusion_probe.py --json、bench/sort_slot.py --json
+# （bench/sort_slot.json 就是 `--json bench/sort_slot.json` 的产物）
+bench/*.json
+# 例外：bench/candidate_tasks.json 不是产物，是探针的输入任务清单
+# （bench/candidate_probe.py:61 TASK_FILE 只读不写），必须入库。
+!bench/candidate_tasks.json
+
+# ---------- 本机 / 密钥 ----------
+# 公开仓库不绑定任何人的本机配置：执行器一律从环境变量读取。
+#   AZFLS_API_BASE / AZFLS_API_KEY / AZFLS_MODEL / TYPESAFE_API_KEY
+.env
+.env.*
+.DS_Store
+
+# ---------- 演示录制中间产物（成品 mp4 入库，帧与 gif 不入库）----------
+demo/frames/
+demo/*.gif
+demo/*.cast

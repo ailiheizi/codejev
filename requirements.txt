@@ -1,0 +1,106 @@
+# az-fls 依赖记录（由 .venv 的 `python -m pip list --format=freeze` 导出，按用途分组）
+#
+# 为什么用 requirements.txt 而不是 pyproject.toml：
+#   1. 本项目不是被安装的包：仓库里没有打包元数据，也没有 console_scripts，
+#      代码是从仓库根目录用 `python -m azfls.cli ...` / `python -m bench.xxx` 跑的
+#      （依赖 CWD 落在 sys.path 上）。pyproject.toml 会引入 name/version/build-backend
+#      这些仓库里不存在的概念，并暗示 `pip install -e .` 这种本项目并不使用的流程。
+#   2. docs/11-measured-results.md:454 已经用 pin 的形式记录过依赖
+#      （`mlx==0.32.2`、`transformers==5.17.0`），requirements.txt 与它同形，便于逐条对照。
+#   3. pip freeze 的输出天然就是这个格式，导入/导出口径一致。
+#
+# 复核环境：macOS / Apple Silicon（M1 Pro 16 GB）、Python 3.12.13、pip 26.1.2
+# 分组依据：对 .venv 里每个已装包反查 Required-by，判断它落在哪棵树里——
+#   mlx-lm + libcst → 运行必需；pytest → 开发；mlx-vlm → 可选。
+# 已装的 60 个包全部有归属（第 60 个之外只有 pip 自身，不 pin，见文件末尾）。
+#
+# 只读复核命令：
+#   .venv/bin/python -m pip list --format=freeze
+#   .venv/bin/python -m azfls.cli check     # 不加载权重
+#   .venv/bin/python -m pytest -q           # 全部离线，不加载权重
+
+# ===== 1. 运行必需：本项目代码直接 import 或直接驱动的 =====
+libcst==1.9.0            # azfls/decide.py：ast 提取候选 + libcst 组装
+mlx-lm==0.31.3           # azfls/model.py 的 MLXEngine；bench/*.py 也直接用它
+mlx==0.32.2              # azfls/model.py:91 `import mlx.core as mx`；由 mlx-lm 要求，docs 里也钉此版本
+mlx-metal==0.32.2        # mlx 在 macOS/Apple Silicon 上的平台包（mlx 要求 mlx-metal==0.32.2）
+
+# ===== 2. 运行必需：上面这些依赖带进来的间接包（pin 住才能真正复现）=====
+# 这组不是“可选”：它们都在 mlx-lm / libcst 的必需依赖闭包里，缺任一条都可能让 import 失败。
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+PyYAML==6.0.3
+Pygments==2.21.0
+annotated-doc==0.0.5
+anyio==4.15.1
+certifi==2026.7.22
+click==8.5.0
+filelock==4.0.1
+fsspec==2026.9.0
+h11==0.16.0
+hf-xet==1.6.0
+httpcore==1.0.9
+httpx==0.28.1
+huggingface_hub==1.32.0
+idna==3.20
+markdown-it-py==4.2.0
+mdurl==0.1.2
+numpy==2.5.3
+packaging==26.3
+protobuf==7.36.2
+regex==2026.9.10
+rich==15.0.0
+safetensors==0.8.0
+sentencepiece==0.2.2
+shellingham==1.5.4
+tokenizers==0.23.2
+tqdm==4.70.1
+transformers==5.17.0
+typer==0.27.2
+typing_extensions==4.16.0
+
+# ===== 3. 开发/测试用（运行时不 import，只给 tests/ 用）=====
+pytest==9.1.1            # tests/ 全部离线，不加载权重
+iniconfig==2.3.0
+pluggy==1.6.0
+# 注：packaging 与 Pygments 同时被运行组和 pytest 需要，已列在第 2 组，不重复列。
+
+# ===== 4. 可选 A：扩散后端对照（bench/diffusion_probe.py）=====
+# 只有跑 `python -m bench.diffusion_probe --backend diffusion` 才需要；
+# 本地默认路径（azfls/model.py → mlx-lm）不 import mlx_vlm，所以它是可选依赖。
+mlx-vlm==0.7.1
+mlx-audio==0.5.4         # 由 mlx-vlm 要求（音频/多模态子模块）
+llguidance==1.8.0        # 由 mlx-vlm 要求
+
+# ===== 5. 可选 A 的间接包：只在多模态/音频那条路上被带进来 =====
+# 这些包在本项目 azfls/、bench/、tests/ 里没有任何 import，
+# 也不会被 mlx-lm 或 libcst 拉起——只在装了 mlx-vlm 之后才存在。
+# 不带第 4、5 组，核心两条路线（ask / select）与全部测试都能正常跑。
+fastapi==0.141.1         # ← mlx-vlm 要求；只服务于 mlx-vlm 的 server
+uvicorn==0.53.0          # ← mlx-vlm 要求
+starlette==1.6.0         # ← fastapi / mlx-vlm
+websockets==17.1         # ← mlx-vlm
+python-multipart==0.0.32 # ← mlx-vlm
+pillow==12.3.0           # ← mlx-vlm
+opencv-python==5.0.0.93  # ← mlx-vlm（多模态前处理）
+miniaudio==1.71          # ← mlx-vlm / mlx-audio
+sounddevice==0.5.6       # ← mlx-audio
+scipy==1.18.1            # ← mlx-audio
+requests==2.34.2         # ← mlx-vlm
+urllib3==2.8.0           # ← requests
+charset-normalizer==3.5.1  # ← requests
+cffi==2.1.1              # ← miniaudio / sounddevice
+pycparser==3.0           # ← cffi
+pydantic==2.13.5         # ← fastapi
+pydantic_core==2.46.5    # ← pydantic
+annotated-types==0.8.0   # ← pydantic
+typing-inspection==0.4.4 # ← fastapi / pydantic
+
+# 说明：
+#   * 第 1、2 组是跑通 ask / select 与 `azfls.cli check` 的最小集合；
+#     第 3 组是跑 tests/ 的增量；第 4、5 组合起来才是扩散对照的完整增量。
+#   * opencv-python / fastapi / uvicorn / httpx 常被误当成“项目依赖”：
+#     其中 httpx 实际来自 huggingface_hub，属第 2 组（运行必需）；
+#     fastapi / uvicorn / opencv-python 来自 mlx-vlm，属可选组。
+#   * 这里只记录已实测可用的版本（本机全量 60 包），不做版本范围推导。
+#   * pip 本身（本机 pip==26.1.2）刻意不 pin：它是引导工具，不是项目依赖。

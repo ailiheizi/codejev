@@ -1,0 +1,47 @@
+[
+  {
+    "label": "filter-active",
+    "source_request": "把用户列表改成只保留 active 为真的用户，返回 id 和 name，保持原顺序。",
+    "expected": "0",
+    "operation": "filter_and_project",
+    "target_language": "python",
+    "requirements": ["keep rows where active is true", "return id and name"],
+    "constraints": ["preserve input order"]
+  },
+  {
+    "label": "sort-score",
+    "source_request": "把结果按 score 从高到低排序，保留完整记录。",
+    "expected": "1",
+    "operation": "sort_rows",
+    "target_language": "python",
+    "requirements": ["sort by score", "highest score first", "keep complete rows"],
+    "constraints": ["do not filter rows"]
+  },
+  {
+    "label": "count-category",
+    "source_request": "按 category 分组并统计每组数量，返回 category 到数量的映射。",
+    "expected": "2",
+    "operation": "group_and_count",
+    "target_language": "python",
+    "requirements": ["group rows by category", "count rows in each category"],
+    "constraints": ["return a category-to-count mapping"]
+  },
+  {
+    "label": "join-by-owner",
+    "source_request": "按 owner_id 关联用户和订单，返回合并记录。当前候选页没有这个能力。",
+    "expected": "NONE",
+    "operation": "join_rows",
+    "target_language": "python",
+    "requirements": ["join users with orders by owner_id", "return the combined rows"],
+    "constraints": ["preserve all matching records"]
+  },
+  {
+    "label": "filter-active-with-total",
+    "source_request": "只保留 active 为真的记录，并返回 id、name 和 total。候选页没有包含 total 的候选。",
+    "expected": "NONE",
+    "operation": "filter_and_project",
+    "target_language": "python",
+    "requirements": ["keep rows where active is true", "return id, name, and total"],
+    "constraints": ["preserve input order"]
+  }
+]
