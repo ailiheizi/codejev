@@ -1,179 +1,198 @@
-# ADR 0001：小模型只做无脑候选选择/代码转换
+# ADR 0001: the small model only does brainless candidate selection / code conversion
 
-- 状态：Accepted
-- 日期：2026-09-20
-- 范围：codejev 的小模型执行层
+- Status: Accepted
+- Date: 2026-09-20
+- Scope: codejev's small-model execution layer
 
-## 背景
+## Context
 
-项目目标不是再造一个会聊天、会规划、会自我修复的 Agent，而是让大模型把需求拆成清楚的小任务，再把执行工作交给便宜、快速的小模型。
+The goal is not to build another agent that chats, plans and self-repairs. It is to have the big
+model break a requirement into clear small tasks, and hand the execution work to a cheap, fast
+small model.
 
-已有实测表明：
+Existing measurements show:
 
-- 选择路线在可表达的任务上通过 5/5；
-- 自由生成路线在相近的真实函数任务上通过 0/5；
-- 小模型曾因提示词示例而复制错误决策；
-- 宿主如果替模型猜目标循环、排序或代码结构，会产生静默错误；
-- 0.5B 虽然快约 2 倍，但在最简单任务上 0/10，不能仅靠缩小模型解决问题。
+- the selection route passes 5/5 on tasks it can express;
+- the free-generation route passes 0/5 on comparable real-function tasks;
+- the small model has copied a wrong decision because of an example in the prompt;
+- when the host guesses the target loop, the sort, or the code structure on the model's behalf,
+  the result is a silent error;
+- 0.5B is about 2× faster but scores 0/10 on the simplest task, so shrinking the model alone does
+  not solve the problem.
 
-因此模型职责必须进一步收窄。
+The model's responsibility therefore has to be narrowed further.
 
-## 决策
+## Decision
 
-小模型定义为一个**无状态、无业务决策、无审批能力的候选选择/代码转换器**：
+The small model is defined as a **stateless candidate selector / code converter with no business
+decisions and no approval authority**:
 
 ```text
 CodeTask + CandidatePage
 → candidate_id / NO_MATCH
 ```
 
-或者在已经由大模型确定转换计划后：
+Or, once the big model has already fixed the conversion plan:
 
 ```text
-CodeTask + 必要原文
-→ 代码正文
+CodeTask + the necessary source text
+→ code body
 ```
 
-小模型不负责：
+The small model is not responsible for:
 
-- 解释用户需求；
-- 决定 operation；
-- 决定是否启用排序/比较/去重等槽位；
-- 规划下一步；
-- 诊断失败原因；
-- 选择文件路径；
-- 设置审批状态；
-- 自动重试或自动训练。
+- interpreting the user's requirement;
+- deciding the operation;
+- deciding whether slots such as sort/compare/dedupe are enabled;
+- planning the next step;
+- diagnosing the cause of a failure;
+- choosing file paths;
+- setting approval state;
+- retrying or training automatically.
 
-## 角色分工
+## Who owns what
 
-### 大模型
+### Big model
 
-大模型负责把自然语言需求转换成明确的 `CodeTask`，包括：
+The big model turns a natural-language requirement into an explicit `CodeTask`, including:
 
-- operation；
-- 目标函数/目标范围；
-- 已启用的槽位；
-- 字段、条件、排序和保留约束；
-- 是否拆成多个独立子任务；
-- 是否接受 `NO_MATCH`，还是重新下指令/换生成路线。
+- the operation;
+- the target function / target scope;
+- which slots are enabled;
+- fields, conditions, sorting and retention constraints;
+- whether to split the work into several independent sub-tasks;
+- whether `NO_MATCH` is acceptable, or whether to re-instruct / switch to the generation route.
 
-大模型也负责检查小模型返回的候选代码或转换结果。
+The big model also checks the candidate code or conversion result the small model returns.
 
-### 宿主
+### Host
 
-宿主负责所有确定性和安全边界：
+The host owns all determinism and safety boundaries:
 
-- 提取候选；
-- 给候选分配稳定 id；
-- 校验候选页；
-- 校验小模型返回的 id；
-- 按计划启用或关闭槽位；
-- 组装代码、生成 diff、运行检查；
-- 绑定目标路径与内容哈希；
-- 只有确认后才写盘。
+- extract candidates;
+- assign candidates stable ids;
+- validate the candidate page;
+- validate the id the small model returns;
+- enable or disable slots according to the plan;
+- assemble code, produce diffs, run checks;
+- bind target path and content hash;
+- write to disk only after confirmation.
 
-### 小模型
+### Small model
 
-小模型只执行宿主和大模型已经确定的局部任务。输出越小越好：候选选择只输出一行 id；代码转换只输出正文。
+The small model only executes the local task the host and the big model have already fixed. The
+smaller the output, the better: for candidate selection, one line with an id; for code conversion,
+just the body.
 
-## 为什么不让小模型自己判断槽位
+## Why the small model does not judge slots itself
 
-排序槽位的真实回归说明了风险：提示词示例里出现了 `s=f1,d=desc` 后，用户没有要求排序的 5 条指令全部被模型错误地加上排序。
+A real regression in the sort slot shows the risk: once the prompt example contained `s=f1,d=desc`,
+all 5 instructions that did not ask for sorting got a sort added by the model anyway.
 
-所以：
+Therefore:
 
 ```text
-大模型计划未启用 sort
-→ 宿主不允许 s/d
-→ 小模型返回 s/d 也拒绝
+the big model's plan does not enable sort
+→ the host does not allow s/d
+→ an s/d returned by the small model is rejected too
 ```
 
-可选槽位的启用权属于大模型计划和宿主，不属于小模型。
+The right to enable an optional slot belongs to the big model's plan and the host, not to the small
+model.
 
-### 后续：这条闸门已经落地，四项数字已量（2026-09-20）
+### Follow-up: the gate is in place, and the four numbers are measured (2026-09-20)
 
-排序槽位现在已在 `codejev/decide.py` 中实现并默认关闭，启用权按上文由调用方掌握：
+The sort slot is now implemented in `codejev/decide.py` and is off by default; the right to enable
+it stays with the caller, as described above:
 
 ```text
 Decision(function_id, filter_field, return_fields, sort_field=None, sort_desc=False)
-build_decision_prompt(..., sort_enabled=False)   # 协议位，不从 instruction 猜
-parse_decision(..., sort_enabled=False)          # 未启用时收到 s/d 直接拒绝
+build_decision_prompt(..., sort_enabled=False)   # a protocol bit, not guessed from the instruction
+parse_decision(..., sort_enabled=False)          # rejects s/d outright when not enabled
 ```
 
-按本文档「验收顺序」第 4 条应量的四个数字已经补齐，见
-[实测结果第 G 节](../11-measured-results.md)与[槽位说明](../12-selection-slots.md)：
-排序任务 18/18、输出税 +15 tokens（不用槽位的决策 +0）、老任务回归 15/15、拒绝质量 8/8。
+The four numbers that item 4 of "Acceptance order" in this document calls for are now in place;
+see [measured results, section G](../11-measured-results.md) and
+[the slot notes](../12-selection-slots.md): sort tasks 18/18, output tax +15 tokens (+0 for
+decisions that do not use the slot), old-task regression 15/15, rejection quality 8/8.
 
-**但这次补测暴露了一次真实回归，并已修复**：加排序槽位时顺带改了系统提示，
-删掉了那行 `正确形状示例`，1.5B 随即整个省掉 `f` 键，而宿主把"键缺失"当"不过滤"，
-于是过滤条件被静默删除（不排序的老任务从 3/3 掉到 0/3，生产 CLI 可复现）。
-修法是恢复那行示例，把禁用侧的禁令留在用户消息里——**真正的强制始终在宿主的
-`parse_decision`，不在提示词措辞**，所以安全边界没有变松。
+**But this round of measurement exposed a real regression, and it has been fixed**: while adding
+the sort slot I also edited the system prompt and deleted the `正确形状示例` ("correct shape
+example") line; 1.5B then dropped the `f` key entirely, and the host read "key missing" as "no
+filter", so the filter condition was silently deleted (old non-sorting tasks fell from 3/3 to 0/3,
+reproducible in the production CLI). The fix was to restore that example line and leave the
+disabled-side prohibition in the user message — **the real enforcement is always the host's
+`parse_decision`, never the wording of the prompt** — so the safety boundary did not get looser.
 
-这条给"自进化/复用边界"补了一句：**加槽位这类改动必须带配对照组**，
-因为"模型少选一个键"和"模型有意不过滤"在产物上无法区分。
+This adds a line to the "self-evolution / reuse boundary": **a change such as adding a slot must
+come with a paired control group**, because "the model did not pick a key" and "the model
+deliberately did not filter" are indistinguishable in the artifact.
 
-## 为什么先做候选页，而不是立刻蒸馏
+## Why the candidate page first, instead of distilling right away
 
-候选页协议可以先验证职责边界，不需要训练：
+The candidate-page protocol verifies the responsibility boundary without any training:
 
-- 候选由宿主掌握；
-- 小模型只回 id；
-- `NO_MATCH` 干净地交回大模型；
-- 候选代码原样由宿主物化。
+- the candidates are owned by the host;
+- the small model returns only an id;
+- `NO_MATCH` goes cleanly back to the big model;
+- the candidate code is materialized by the host, byte for byte.
 
-如果真实模型在这个协议上不稳定，失败原因可以区分为：
+If a real model is unstable on this protocol, the cause of failure can be separated into:
 
-1. 候选摘要/候选页不清楚；
-2. 通用 Qwen 没有被训练成选择器；
-3. 候选本身不适合这个任务。
+1. the candidate summary / candidate page is unclear;
+2. the general Qwen was never trained as a selector;
+3. the candidates themselves do not fit the task.
 
-只有确认协议和候选质量都正确后，才考虑训练一个更小的打分器。训练目标不是蒸馏一个聊天模型，而是训练 `CodeTask + candidate → score/id` 的专用选择头。
+Only once both the protocol and the candidate quality are confirmed correct is it worth training a
+smaller scorer. The training target is not to distill a chat model, but to train a dedicated
+selection head for `CodeTask + candidate → score/id`.
 
-## 复用和“自进化”的边界
+## The boundary of reuse and "self-evolution"
 
-允许的演化是宿主级、可审计的复用：
+The allowed evolution is host-level, auditable reuse:
 
 ```text
-大模型确认成功的候选
-→ 加入候选库
-→ 下次优先展示/选择
+a candidate the big model confirmed as successful
+→ added to the candidate library
+→ shown/preferred next time
 ```
 
-暂不做：
+Deliberately not done:
 
-- 自动失败回收训练；
-- 自动修复闭环；
-- 未经大模型确认的线上样本自动进训练集；
-- CoT/长思考日志训练；
-- 复杂的多级 Agent 编排。
+- automatic failure-recycling training;
+- auto-repair loops;
+- automatic entry of unconfirmed online samples into the training set;
+- CoT / long thinking-log training;
+- complex multi-level agent orchestration.
 
-如果未来要训练，只使用大模型确认过的“CodeTask → 正确代码/候选”配对，做普通监督训练或专用打分器训练。
+If we do train later, use only "CodeTask → correct code/candidate" pairs that the big model has
+confirmed, for ordinary supervised training or for a dedicated scorer.
 
-## 后果
+## Consequences
 
-### 正面
+### Positive
 
-- 小模型可以很小、很快、很便宜；
-- 输出格式简单，易校验；
-- 模型错误不会直接获得路径、审批或写盘权限；
-- `NO_MATCH` 是明确失败，不会被伪装成代码；
-- 多个独立 CodeTask 可以并行发送；
-- 候选库可以逐步增长而不需要先搭训练平台。
+- the small model can be very small, very fast and very cheap;
+- the output format is simple and easy to validate;
+- a model error does not by itself gain access to paths, approval, or disk writes;
+- `NO_MATCH` is an explicit failure and cannot be disguised as code;
+- several independent CodeTasks can be sent in parallel;
+- the candidate library can grow gradually, without first building a training platform.
 
-### 代价
+### Cost
 
-- 大模型必须承担拆任务、制定计划和检查结果；
-- 候选提取与候选库质量决定覆盖率；
-- 当前 Python 组装层只支持 Python；
-- 没有合适候选时仍需要生成路线或大模型直接处理；
-- 小模型不能自行修复模糊任务。
+- the big model has to break down tasks, make the plan, and check the results;
+- candidate extraction and candidate-library quality decide coverage;
+- the current Python assembly layer supports Python only;
+- when no suitable candidate exists, a generation route or direct big-model handling is still
+  required;
+- the small model cannot repair an ambiguous task by itself.
 
-## 验收顺序
+## Acceptance order
 
-1. 先通过 `docs/10-tomorrow-goal.md` 的候选页端到端验收；
-2. 最小验收阶段使用 `bench/candidate_tasks.json` 作为主模型已经生成好的 CodeTask 输入，隔离远端大模型/API 变量；
-3. 再测候选覆盖率和 `NO_MATCH` 质量；
-4. 再加入排序/比较等槽位，每个槽位单独测误触发；
-5. 最后才决定是否训练专用打分器或做候选复用库。
+1. first pass the candidate-page end-to-end acceptance in `docs/10-tomorrow-goal.md`;
+2. for the minimal acceptance stage, use `bench/candidate_tasks.json` as the CodeTask input the big
+   model has already produced, isolating the remote big-model/API variable;
+3. then measure candidate coverage and `NO_MATCH` quality;
+4. then add slots such as sort/compare, measuring false triggers for each slot separately;
+5. only then decide whether to train a dedicated scorer or build a candidate reuse library.

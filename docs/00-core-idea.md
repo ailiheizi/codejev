@@ -1,41 +1,65 @@
-# 核心想法：短指令，快结果，快决定
+# Core idea: short instructions, fast results, fast decisions
 
-## 用户要的是什么
+## What the user wants
 
-大模型负责决定怎么做、改哪里、用哪些字段和变量。小模型接到明确指令和必要原文，快速组合出代码、修改结果或结构化内容，不聊天，不写解释，不自己规划。
+The big model decides how to do it, where to change, and which fields and variables to use. The
+small model receives an explicit instruction and the source text it needs, and quickly assembles
+code, an edit, or structured content — it does not chat, it does not write explanations, it does
+not plan on its own.
 
-小模型的结果直接交给大模型判断。大模型只把用户需要知道的结果、建议或选择简短地呈现出来，让用户容易决定下一步。
+The small model's result goes straight to the big model for judgement. The big model presents only
+the result, suggestion or choice the user needs, briefly, so the next step is easy to decide.
 
-**省的是重复思考、冗长输出和无必要的交接。**
+**What is saved is repeated thinking, verbose output, and unnecessary handoffs.**
 
-## 三个角色
+## Three roles
 
-| 角色 | 只负责什么 |
+| Role | Only responsible for |
 | --- | --- |
-| 大模型 | 决定做法，发短指令，看结果，给用户结论 |
-| 小模型 | 按指令写出或改出结果 |
-| 用户 | 只在需要取舍的地方作决定 |
+| Big model | deciding the approach, sending short instructions, reading results, giving the user a conclusion |
+| Small model | writing or editing the result the instruction asks for |
+| User | deciding only where a real trade-off is needed |
 
-“小模型不用懂”指它不承担业务理解和决策职责；具体语法和组合能力使用现成代码模型已有的能力。不必为它设计另一套思考流程。
+"Small model does not need to understand" means it carries no business understanding and no
+decision responsibility; for syntax and composition it uses what an off-the-shelf code model
+already has. There is no need to design a separate thinking process for it.
 
-## 指令只说必要的信息
+## An instruction says only what is necessary
 
-告诉小模型目标、怎么改、必须保留什么，再给需要的原文。字段名、变量名、接口和做法尽量由大模型直接给出。短自然语言或简单字段都可以，不先设计复杂 DSL。
+Tell the small model the goal, how to change it, and what must be preserved, then give it the
+source text it needs. Field names, variable names, interfaces and the approach should come from
+the big model wherever possible. Short natural language or plain fields are both fine; no complex
+DSL is designed up front.
 
-例如，大模型可以说：“修改用户列表函数：只保留 active 为真的项，返回 id 和 name；保持原顺序，其他不变。”小模型只返回对应代码或修改结果。
+For example, the big model can say: "修改用户列表函数：只保留 active 为真的项，返回 id 和 name；
+保持原顺序，其他不变。" ("Modify the user-list function: keep only rows where active is true,
+return id and name; keep the original order, change nothing else.") The small model returns only
+the corresponding code or edit.
 
-短的前提是信息够用；不用为省几个字让小模型猜业务规则。已经给过且没有变化的原文和上下文可以复用。
+Short is only acceptable when the information is sufficient; do not make the small model guess
+business rules in order to save a few characters. Source text and context that have already been
+given and have not changed can be reused.
 
-## 给用户的结果也要短
+## What goes back to the user is short too
 
-大模型看完产物，通常只给结论、必要差异和建议。确实有取舍才给选项，不默认生成多个方案或长报告。详细代码按需展开。
+After reading the artifact, the big model usually gives only the conclusion, the necessary
+differences, and a suggestion. Options are given only when there is a real trade-off; several
+alternatives or a long report are not the default. Detailed code is expanded on demand.
 
-例如：“已按要求改好。只返回有效用户的 id/name，顺序不变。建议采用。”这句话只能在实际完成并检查后说，不能代替真实结果。
+For example: "Done as requested. Only valid users' id/name are returned; order unchanged. Recommend
+accepting." This can only be said after the work is actually finished and checked — it does not
+stand in for the real result.
 
-## 当前边界
+## Current boundary
 
-不做错误学习、失败回收训练、强化学习、自我改进循环和复杂 agent 编排。指令需要调整时，由大模型直接重新下指令；这属于当前任务修改，不进入训练闭环。
+No error learning, failure-recycling training, reinforcement learning, self-improvement loops, or
+complex agent orchestration. When an instruction needs adjusting, the big model simply re-instructs;
+that is a change within the current task and does not enter a training loop.
 
-普通 SFT 可以保留为可选手段：只学习正常的“指令加原文 → 正确结果”和标准输出。先看现有小模型能否直接使用。
+Ordinary SFT stays available as an option: learn only the normal "instruction plus source text →
+correct result" and the standard output. First see whether the existing small model can be used
+as it is.
 
-最终文件或命令经大模型确认后，适配器才写入或执行。整体价值看是否更快给出可用结果和可决策结论，尚未承诺实际提速。
+The adapter writes or executes the final file or command only after the big model has confirmed it.
+The overall value is judged by whether a usable result and a decidable conclusion come faster; no
+actual speedup is claimed yet.

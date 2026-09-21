@@ -54,3 +54,7 @@ bench/*.json
 demo/frames/
 demo/*.gif
 demo/*.cast
+# 演示视频暂不入库：作者要求先看测试，视频留在本地
+demo/*.mp4
+demo/loop_assets/
+demo/render_loop_video.py
